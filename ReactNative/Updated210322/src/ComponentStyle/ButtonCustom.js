@@ -9,22 +9,32 @@ const ButtonCustom = ({ textInBtn,func }) => {
   )
 }
 
-export default ButtonCustom
+export default ButtonCustom;
 
 const styles = StyleSheet.create({
   btnS: {
+    marginTop:20,
     width: "30%",
     backgroundColor: "#52B69A",
     color: "black",
     alignSelf: 'center',
-    padding: 10,
+    padding: 7,
     borderRadius: 20,
     fontSize: 18,
-    margin: 10
+    borderColor:'black',
+    borderWidth:1,
+    shadowColor: 'black',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 1.8,
+    elevation: 4
   },
   text:{
     textAlign: 'center',
-    fontSize:16,
+    fontSize:14,
 
   }
 })

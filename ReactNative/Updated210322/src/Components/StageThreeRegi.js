@@ -4,7 +4,7 @@ import CubeType from '../ComponentStyle/CubeType';
 import ToggleStyle from '../ComponentStyle/ToggleStyle';
 import ButtonCustom from '../ComponentStyle/ButtonCustom';
 
-const StageThreeRegi = ({checkValuesAndNext}) => {
+const StageThreeRegi = ({ checkValuesAndNext }) => {
 
   const [wantToVul, setwantToVul] = useState(true);
   const [listOfTypes, setlistOfTypes] = useState([])
@@ -12,6 +12,9 @@ const StageThreeRegi = ({checkValuesAndNext}) => {
   const apiUrl = 'https://proj.ruppin.ac.il/bgroup86/prod/api/Types';
 
   useEffect(() => {
+
+    console.log('yay')
+
     fetch(apiUrl, {
       method: 'GET',
       headers: new Headers({
@@ -24,8 +27,8 @@ const StageThreeRegi = ({checkValuesAndNext}) => {
       })
       .then(
         (result) => {
-         setlistOfTypes(result)
-         console.log("res",result)
+          setlistOfTypes(result)
+          console.log("res", result)
         },
         (error) => {
           console.log("err post=", error);
@@ -41,9 +44,14 @@ const StageThreeRegi = ({checkValuesAndNext}) => {
         ? null
         : <View>
           <Text style={styles.title}> תחומים שאשמח להתנדב בהם </Text>
-          <View >
+          <View>
             <FlatList
-              columnWrapperStyle={styles.wrap}
+              columnWrapperStyle={true}
+              contentContainerStyle={{
+                margin: 5,
+                alignItems: 'flex-end',
+
+              }}
               numColumns={3}
               data={listOfTypes}
               keyExtractor={(item) => item}

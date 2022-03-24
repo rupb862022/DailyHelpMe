@@ -2,13 +2,13 @@ import { StyleSheet, Text, SafeAreaView } from 'react-native';
 import React, { useState } from 'react';
 import ButtonCustom from '../ComponentStyle/ButtonCustom'
 import InputStyle from '../ComponentStyle/InputStyle'
+import ErrorText from '../ComponentStyle/ErrorText'
 
-
-const StageOneRegi = ({ nextStage }) => {
+const StageOneRegi = ({ checkAndMove }) => {
 
   const [phone, setPhone] = useState();
   const [password, setPassword] = useState();
-  const [firstName, setFirstName] = useState();
+  const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState();
 
   const [firstNameOk, setFirstNameOk] = useState(true);
@@ -16,69 +16,92 @@ const StageOneRegi = ({ nextStage }) => {
   const [passwordOk, setPasswordOk] = useState(true);
   const [phoneOk, setPhoneOk] = useState(true);
 
-  const checkValuesAndNext = () => {
+  const MoveToPageTwo = () => {
     ///פונקציה לבדוק תקינות ואז להעביר לעמוד הבא
     console.log(phone, password, firstName, lastName)
-    if(firstNameError && lastNameError && passwordError && phoneError)
-      { 
-          if(phone != null &&  password != null &&  firstName!=null && lastName!=null)
-          {
-            //nextStage()
-          }
+    if (firstNameOk && lastNameOk && passwordOk && phoneOk) {
+      if (phone != null && password != null && firstName != null && lastName != null) {
+        console.log("yy")
+        checkAndMove('1', {
+          FirstName: firstName,
+          LastName: lastName,
+          Passwords: password,
+          MobilePhone: phone,
+        });
+       
       }
+    }
   }
 
-  const checkFirstName = () => {
-    
-    if(firstName==null)
-      {
+  const checkNames = (name) => {
+
+    var input;
+    if (name == "שם פרטי") {
+      if (firstName == "") {
         setFirstNameOk(false)
         return;
       }
-    
-    for (let index = 0; index < firstName.length; index++) {
-      if (firstName[index] == 32 || firstName[index] == 45) {
-        setFirstNameOk(true)
-      }
-      else if (firstName[index] < 65 || 122 < firstName[index]) {
-        setFirstNameOk(false)
+      input = firstName;
+    }
+    else {
+      if (lastName == null) {
+        setLastNameOk(false)
         return;
       }
-      else if (firstName[index] > 90 && 97 > firstName[index]) {
-        setFirstNameOk(false)
+      input = lastName;
+    }
+
+    for (let index = 0; index < input.length; index++) {
+      if (input[index] == 32 || input[index] == 45) {
+        name == "שם פרטי" ? setFirstNameOk(true) : setLastNameOk(true)
+      }
+      else if (input[index] < 65 || 122 < input[index]) {
+        console.log("yo")
+        name == "שם פרטי" ? setFirstNameOk(false) : setLastNameOk(false)
+        return;
+      }
+      else if (input[index] > 90 && 97 > input[index]) {
+        name == "שם פרטי" ? setFirstNameOk(false) : setLastNameOk(false)
+        console.log("yoyoyo")
         return;
       }
       else {
-        setFirstNameOk(true)
+        name == "שם פרטי" ? setFirstNameOk(true) : setLastNameOk(true)
       }
-
     }
-  
-  }
-
-  const checkLastName = () => {
-
   }
 
   const checkPhoneNumber = () => {
-
+    if (phone == null) {
+      setPhoneOk(false)
+      return;
+    }
+    (phone.length == 10) ? setPhoneOk(true) : setPhoneOk(false)
   }
 
   const checkPassword = () => {
-
+    if (password == null) {
+      setPasswordOk(false)
+      return;
+    }
+    else if (password.length < 6) {
+      setPasswordOk(false)
+      return;
+    }
+    setPasswordOk(true)
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <InputStyle placeHolderText="שם פרטי" icon="Ionicons" nameOfIcon="person" func={setFirstName} funcForCheck={checkFirstName} max={10}/>
-      {firstNameOk ? null : <Text style={styles.textError}> חייב להכיל אותיות בלבד </Text>}
-      <InputStyle placeHolderText="שם משפחה" icon="Ionicons" nameOfIcon="person" func={setLastName} funcForCheck={checkLastName}  max={15} />
-      {lastNameOk ? null : <Text style={styles.textError}> נא להקליד שנית </Text>}
-      <InputStyle placeHolderText="סיסמא" icon="Entypo" nameOfIcon="lock" func={setPassword} funcForCheck={checkPhoneNumber}  max={8}/>
+      <InputStyle placeHolderText="שם פרטי" icon="Ionicons" nameOfIcon="person" func={setFirstName} funcForCheck={checkNames} max={10} />
+      {firstNameOk ? null : firstName != "" ? <ErrorText text=" חייב להכיל אותיות בלבד" /> : <ErrorText text="סעיף זה חובה" />}
+      <InputStyle placeHolderText="שם משפחה" icon="Ionicons" nameOfIcon="person" func={setLastName} funcForCheck={checkNames} max={15} />
+      {lastNameOk ? null : lastName != null ? <Text style={styles.textError}> נא להקליד שנית </Text> : <Text style={styles.textError}> סעיף זה חובה </Text>}
+      <InputStyle placeHolderText="סיסמא" icon="Entypo" nameOfIcon="lock" func={setPassword} funcForCheck={checkPassword} max={10} />
       {passwordOk ? null : <Text style={styles.textError}> נא להקליד שנית </Text>}
-      <InputStyle placeHolderText="טלפון" icon="Entypo" nameOfIcon="phone" func={setPhone} funcForCheck={checkPassword} max={10} />
+      <InputStyle placeHolderText="טלפון" icon="Entypo" nameOfIcon="phone" func={setPhone} funcForCheck={checkPhoneNumber} max={10} />
       {phoneOk ? null : <Text style={styles.textError}> נא להקליד שנית </Text>}
-      <ButtonCustom textInBtn="המשך" func={checkValuesAndNext} />
+     <ButtonCustom textInBtn="המשך" func={MoveToPageTwo} />
     </SafeAreaView>
   )
 }
@@ -111,9 +134,10 @@ const styles = StyleSheet.create({
   problemText: {
     color: 'red',
   },
-  textError:{
-      color:'red',
-      textAlign:'right',
-      width: '80%'
+  textError: {
+    color: 'red',
+    textAlign: 'right',
+    width: '80%'
   },
+
 })

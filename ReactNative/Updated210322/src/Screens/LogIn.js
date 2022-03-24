@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import ButtonCustom from '../ComponentStyle/ButtonCustom';
 // import Register from '../api/Register'
 
-import * as Facebook from 'expo-facebook';
+//import * as Facebook from 'expo-facebook';
 import { useFocusEffect } from '@react-navigation/native';
 
 const LogIn = ({ navigation }) => {

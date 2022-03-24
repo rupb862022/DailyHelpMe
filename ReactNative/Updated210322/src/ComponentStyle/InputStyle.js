@@ -5,7 +5,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 
 const GOOGLE_PLACES_API_KEY = 'AIzaSyD_GGypBzDabu8UYars4z1DTFG8PLRsvY4';
 
-const InputStyle = ({ placeHolderText, icon, nameOfIcon, func, funcForCheck,max }) => {
+const InputStyle = ({ placeHolderText, icon, nameOfIcon, func, funcForCheck, max, value }) => {
 
   const [iconChose, setIcon] = useState();
 
@@ -14,8 +14,9 @@ const InputStyle = ({ placeHolderText, icon, nameOfIcon, func, funcForCheck,max 
     placeholder: placeHolderText,
     autoCorrect: false,
     secureTextEntry: (placeHolderText == "סיסמא") ? true : false,
-    keyboardType: (placeHolderText == "טלפון"|| placeHolderText =="תעודת זהות")? "numeric" :null,
-    maxLength: (placeHolderText == "כתובת" || placeHolderText =="תאריך לידה") ? null : max,
+    keyboardType: (placeHolderText == "טלפון" || placeHolderText == "תעודת זהות") ? "numeric" : null,
+    maxLength: (placeHolderText == "כתובת" || placeHolderText == "תאריך לידה") ? null : max,
+    editable: (placeHolderText == "תאריך לידה") ? false : true,
   }
 
   useEffect(() => {
@@ -41,24 +42,44 @@ const InputStyle = ({ placeHolderText, icon, nameOfIcon, func, funcForCheck,max 
 
   if (placeHolderText == "כתובת") {
     return (
-    <View style={styles.inputBox}>
-         <GooglePlacesAutocomplete
+      <View style={styles.inputBox} >
+        <GooglePlacesAutocomplete
           suppressDefaultStyles={true}
-         
+          listUnderlayColor='#52B69A'
+          numberOfLines={3}
+          textInputProps={{
+            color: 'black',
+            textAlign: 'right'
+          }}
+          styles={{
+            listView: {
+              width: '100%',
+              right: -25
+            },
+            separator: {
+              height: 1,
+              backgroundColor: '#52B69A',
+            },
+            poweredContainer: {
+              backgroundColor: '#52B69A',
+            },
+          }}
           placeholder='כתובת'
           onPress={(data, details = null) => {
             // 'details' is provided when fetchDetails = true
-            console.log(data, details);
+            func(data, details);
+
           }}
           query={{
             key: GOOGLE_PLACES_API_KEY,
-            language: 'heb',
+            language: 'iw',
+            region: 'il'
           }}
 
         />
         {iconChose}
-    </View>
-  )
+      </View>
+    )
   }
 
   return (
@@ -66,7 +87,8 @@ const InputStyle = ({ placeHolderText, icon, nameOfIcon, func, funcForCheck,max 
       <TextInput
         {...textInpotProp}
         onChangeText={text => func(text)}
-        onEndEditing={()=> funcForCheck()}        
+        onEndEditing={() => funcForCheck(placeHolderText)}
+        value={(placeHolderText == "תאריך לידה") ? value : null}
       />
       {iconChose}
     </View>

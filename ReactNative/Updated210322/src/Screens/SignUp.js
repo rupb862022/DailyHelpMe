@@ -4,7 +4,23 @@ import StageOneRegi from '../Components/StageOneRegi';
 import StageTwoRegi from '../Components/StageTwoRegi';
 import StageThreeRegi from '../Components/StageThreeRegi';
 import { useFocusEffect } from '@react-navigation/native';
+import CameraUpload from '../Components/CameraUpload';
 
+
+// ID
+// FirstName
+// LastName
+// MobilePhone 
+// Passwords
+// DateOfBirth
+// Photo
+// InterestedInMailing
+// UStatus
+// Gender
+// TotalRate
+// StreetCode
+// CityCode,
+// UserDescription
 
 const SignUp = ({ navigation }) => {
 
@@ -15,13 +31,15 @@ const SignUp = ({ navigation }) => {
   const [formNum, setformNum] = useState(1);
   const [stage, setStage] = useState(<StageOneRegi />);
 
+  const [user, setUser] = useState([]);
+
   useFocusEffect(() => {
     navigation.setOptions({ tabBarStyle: { display: 'none' } });
   })
 
   const styleBtn1 = {
     style: stageOne ? styles.textBtnBold : styles.textInBtn,
-    disabled :stageOne ? true : false
+    disabled: stageOne ? true : false
   }
   const styleBtn2 = {
     style: stageTwo ? styles.textBtnBold : styles.textInBtn,
@@ -29,16 +47,40 @@ const SignUp = ({ navigation }) => {
   }
   const styleBtn3 = {
     style: stageThree ? styles.textBtnBold : styles.textInBtn,
-    disabled:stageThree ? true : false,
+    disabled: stageThree ? true : false,
+  }
+
+  useEffect(() => {
+    console.log(user)
+  }, [user])
+
+  const checkAndMove = (numOfStage, json) => {
+    console.log(json)
+    switch (numOfStage) {
+      case '1':
+        setUser({ ...user, user: json })
+
+        setformNum(2);
+        return;
+      case '2':
+        setUser([...user, json])
+        return;
+      case '3':
+        setUser([...user, json])
+        return;
+      default:
+        return;
+
+    }
   }
 
   useEffect(() => {
     switch (formNum) {
       case 1:
-        setStage(<StageOneRegi />)
+        setStage(<StageOneRegi checkAndMove={checkAndMove} />)
         return;
       case 2:
-        setStage(<StageTwoRegi />)
+        setStage(<StageTwoRegi openCameraStageTwo={openCameraStageTwo} />)
         setStageTwo(true)
         return;
       case 3:
@@ -50,37 +92,46 @@ const SignUp = ({ navigation }) => {
     }
   }, [formNum])
 
+  const openCameraStageTwo = () => {
+    console.log("entered")
+    return <CameraUpload />
+
+  }
+
   return (
     <SafeAreaView>
       <View style={styles.container}>
-        <View style={styles.btnBox}>
-          <TouchableOpacity 
-            onPress={() => {
-              setformNum(3)
-            }}
-            style={styles.btn}
-          >
-            <Text  {...styleBtn3}>  שלב 3</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={() => {
-              setformNum(2)
-            }}
-            style={styles.btn}
-          >
-            <Text  {...styleBtn2}>  שלב 2</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={() => {
-              setformNum(1)
-            }}
-            style={styles.btn}
-          >
-            <Text  {...styleBtn1}>  שלב 1</Text>
-          </TouchableOpacity>
-        </View>
-       {stage}
+      
+          <View style={styles.btnBox}>
+            <TouchableOpacity
+              onPress={() => {
+                setformNum(3)
+              }}
+              style={styles.btn}
+            >
+              <Text  {...styleBtn3}>  שלב 3</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setformNum(2)
+              }}
+              style={styles.btn}
+            >
+              <Text  {...styleBtn2}>  שלב 2</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setformNum(1)
+              }}
+              style={styles.btn}
+            >
+              <Text  {...styleBtn1}>  שלב 1</Text>
+            </TouchableOpacity>
+          </View>
+        
+        {stage}
       </View>
+
     </SafeAreaView>
   )
 }

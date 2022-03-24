@@ -37,13 +37,6 @@ const CostumTabBarButton = ({ children, onPress }) => {
 
 const TabNav = ({ navigation }) => {
 
-  useFocusEffect(() => {
-    navigation.setOptions({
-      tabBarStyle: { display: 'none' },
-      headerShown: false
-    });
-  })
-
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -99,7 +92,7 @@ const TabNav = ({ navigation }) => {
       }
     >
       <Tab.Screen name="Home" component={HomePage} options={{title:'דף הבית'}}/>
-      <Tab.Screen name="Sign" component={SignUp} options={{title:'הרשמה'}} />
+      <Tab.Screen name="Sign" component={SignUp} options={{title:'הרשמה'}} tabBarStyle= {{ display: 'none' }}/>
       <Tab.Screen name="AddRequest" component={AddRequest}
         options={{
           title:'יצירת בקשה',

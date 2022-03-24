@@ -5,18 +5,14 @@ const CubeType = ({ type }) => {
 
   const [isPress, setIsPress] = useState(false);
 
-  const textProps = {
-    style: isPress ? styles.textPressed : styles.text,
-  };
-
 
   return (
-    <TouchableOpacity onPress={()=> {
-      isPress? setIsPress(false) : setIsPress(true)
+    <TouchableOpacity onPress={() => {
+      isPress ? setIsPress(false) : setIsPress(true)
     }}
-    style={styles.cube}
+      style={styles.cube}
     >
-      <Text {...textProps}> {type} </Text>
+      <Text style={isPress ? styles.textPressed : styles.text} > {type} </Text>
     </TouchableOpacity>
   )
 }
@@ -26,6 +22,7 @@ export default CubeType
 const styles = StyleSheet.create({
   cube: {
     margin: 5,
+    
   },
   text: {
     color: '#52B69A',

@@ -1,11 +1,8 @@
-import { StyleSheet, Text, View, SafeAreaView } from 'react-native'
+import { StyleSheet, View, SafeAreaView } from 'react-native'
 import React, { useState } from 'react'
 import InputStyle from '../ComponentStyle/InputStyle'
-import { Ionicons, Feather } from '@expo/vector-icons';
 import ToggleStyle from '../ComponentStyle/ToggleStyle';
-import { List } from 'react-native-paper';
-import Accordion from 'react-native-collapsible/Accordion';
-import Collapsible from 'react-native-collapsible';
+
 
 const AddRequest = () => {
 
@@ -22,9 +19,9 @@ const AddRequest = () => {
       <InputStyle placeHolderText="שם הבקשה" />
       <ToggleStyle state={privateR} text=" הפוך בקשה לאישית" func={setPrivateR} />
       <View style={styles.accordionsBox}>
-        <Collapsible >
-        
-        </Collapsible>
+      <ToggleStyle state={privateR} text=" שם משימה " func={setPrivateR} />
+
+
       </View>
     </SafeAreaView>
   )
