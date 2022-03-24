@@ -6,7 +6,6 @@ import CalendarBoard from './CalendarBoard';
 import ButtonCustom from '../ComponentStyle/ButtonCustom'
 import InputStyle from '../ComponentStyle/InputStyle'
 //import DateTimePicker from '@react-native-community/datetimepicker';
-import CameraUpload from './CameraUpload';
 
 const StageTwoRegi = ({ checkAndMove ,openCameraStageTwo}) => {
 

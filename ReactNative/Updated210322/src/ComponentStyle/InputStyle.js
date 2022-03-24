@@ -17,6 +17,7 @@ const InputStyle = ({ placeHolderText, icon, nameOfIcon, func, funcForCheck, max
     keyboardType: (placeHolderText == "טלפון" || placeHolderText == "תעודת זהות") ? "numeric" : null,
     maxLength: (placeHolderText == "כתובת" || placeHolderText == "תאריך לידה") ? null : max,
     editable: (placeHolderText == "תאריך לידה") ? false : true,
+    multiline: (placeHolderText == "אישור שיבוץ")? true : false,
   }
 
   useEffect(() => {

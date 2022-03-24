@@ -32,6 +32,7 @@ const SignUp = ({ navigation }) => {
   const [stage, setStage] = useState(<StageOneRegi />);
 
   const [user, setUser] = useState([]);
+  const [OpenCamera, setOpenCamera] = useState()
 
   useFocusEffect(() => {
     navigation.setOptions({ tabBarStyle: { display: 'none' } });
@@ -95,13 +96,11 @@ const SignUp = ({ navigation }) => {
   const openCameraStageTwo = () => {
     console.log("entered")
     return <CameraUpload />
-
   }
 
   return (
     <SafeAreaView>
       <View style={styles.container}>
-      
           <View style={styles.btnBox}>
             <TouchableOpacity
               onPress={() => {

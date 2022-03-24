@@ -19,8 +19,26 @@ const AddRequest = () => {
       <InputStyle placeHolderText="שם הבקשה" />
       <ToggleStyle state={privateR} text=" הפוך בקשה לאישית" func={setPrivateR} />
       <View style={styles.accordionsBox}>
-      <ToggleStyle state={privateR} text=" שם משימה " func={setPrivateR} />
+        <ToggleStyle state={privateR} text=" שם משימה " func={setPrivateR} />
+        <View style={styles.listBox}>
+          <List.Section title="בקשות פתוחות להתנדבות" style={styles.title1}>
+            <List.Accordion
+              title="Uncontrolled Accordion"
+              left={props => <List.Icon {...props} icon="folder" />}>
+              <List.Item title="First item" />
+              <List.Item title="Second item" />
+            </List.Accordion>
 
+            <List.Accordion
+              title="Controlled Accordion"
+              left={props => <List.Icon {...props} icon="folder" />}
+              expanded={expanded}
+              onPress={handlePress}>
+              <List.Item title="First item" />
+              <List.Item title="Second item" />
+            </List.Accordion>
+          </List.Section>
+        </View>
 
       </View>
     </SafeAreaView>
@@ -34,8 +52,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignItems: 'flex-end',
   },
-  accordionsBox: {
+  listBox: {
     width: '100%',
-  }
+  },
+
+
 
 })
