@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { Camera } from 'expo-camera';
 
-export default function CameraUpload() {
+const CameraUpload= ()=> {
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [camera, setCamera] = useState(null);
@@ -15,6 +15,41 @@ export default function CameraUpload() {
     })();
   }, []);
 
+  const UploadPic = (picName) => {
+      let urlAPI = 'https://proj.ruppin.ac.il/bgroup86/prod/uploadpicture';
+      let picture = new FormData();
+
+      picture.append('picture',{
+        uri: picUri,
+        name: 'User.jpg',
+        type: 'image/jpg'
+      });
+
+      const config = {
+        method: 'POST',
+        body: picture,
+      }
+  
+      fetch(urlAPI, config)
+        .then((res) => {
+          if (res.status == 201) { return res.json(); }
+          else { return "errrrrr"; }
+        })
+        .then((responseData) => {
+          if (responseData != "err") {
+            let picNameWOExt = picName.substring(0, picName.indexOf("."));
+            let imageNameWithGUID = responseData.substring(responseData.indexOf(picNameWOExt),
+              responseData.indexOf(".jpg") + 4);
+            console.log(imageNameWithGUID);
+            console.log("img uploaded successfully!");
+          }
+          else { alert('error uploding  :(...'); }
+        })
+        .catch(err => { alert('err upload= ' + err); });
+
+  }
+
+
   if (hasPermission === null) {
     return <View />;
   }
@@ -23,7 +58,9 @@ export default function CameraUpload() {
   }
   return (
     <View style={styles.container}>
-      <Camera style={styles.camera} type={type} ref={ref => setCamera(ref)} >
+      <Camera style={styles.camera}
+        type={type}
+        ref={ref => setCamera(ref)} >
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.button}
@@ -41,9 +78,9 @@ export default function CameraUpload() {
             style={styles.button}
             onPress={async () => {
               if (camera) {
-                const data = await camera.takePictureAsync(null);
+                const data = await camera.takePictureAsync({ quality: 0.8 });
                 console.log(data.uri)
-                setPicUri(data.uri);              
+                setPicUri(data.uri);
               }
             }}
           >
@@ -53,9 +90,12 @@ export default function CameraUpload() {
         </View>
       </Camera >
 
-      <View style={{ flex: 0.5, justifyContent: 'center' }}>
+      <View style={styles.snapBox}>
         {picUri && <Image source={{ uri: picUri }}
-          style={{ width: 250, height: 150, borderWidth: 1, borderColor: 'red', margin: 20, alignSelf: 'center' }} />}
+          style={styles.snapPhoto} />}
+        {picUri && <TouchableOpacity style={styles.btn} onPress={() => UploadPic('user')}>
+          <Text> אהבתי את התמונה! </Text>
+        </TouchableOpacity> }   
       </View>
     </View >
   );
@@ -64,9 +104,9 @@ export default function CameraUpload() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    zIndex:1, 
+    zIndex: 1,
     position: 'absolute',
-    alignSelf:'center',
+    alignSelf: 'center',
     width: '100%',
     height: '100%',
   },
@@ -77,15 +117,41 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
     flexDirection: 'row',
-    margin: 20,
+    margin: 10,
   },
   button: {
     flex: 0.2,
     alignSelf: 'flex-end',
-    alignItems: 'center',
   },
   text: {
     fontSize: 18,
     color: 'white',
   },
+  snapPhoto: {
+    width: 200,
+    height: 200,
+    borderWidth: 2,
+    borderColor: '#52B69A',
+    borderRadius: 100,
+    margin: 10,
+    alignSelf: 'center',
+    
+  },
+  snapBox: {
+    flex: 0.4,
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    alignItems: 'center',
+  },
+  btn: {
+   borderRadius: 20,
+    backgroundColor:'#52B69A',
+    alignItems: 'center',
+    borderColor:'black',
+    borderWidth: 1,
+    padding:5,
+
+  }
 });
+
+export default CameraUpload;

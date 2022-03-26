@@ -33,6 +33,7 @@ const CalendarBoard = ({ setDate }) => {
   return (
     <View style={styles.container}>
       <Calendar
+    
         enableSwipeMonths
         style={{
           borderColor: 'white',

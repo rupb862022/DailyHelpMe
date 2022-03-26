@@ -96,7 +96,7 @@ const StageOneRegi = ({ checkAndMove }) => {
       <InputStyle placeHolderText="שם פרטי" icon="Ionicons" nameOfIcon="person" func={setFirstName} funcForCheck={checkNames} max={10} />
       {firstNameOk ? null : firstName != "" ? <ErrorText text=" חייב להכיל אותיות בלבד" /> : <ErrorText text="סעיף זה חובה" />}
       <InputStyle placeHolderText="שם משפחה" icon="Ionicons" nameOfIcon="person" func={setLastName} funcForCheck={checkNames} max={15} />
-      {lastNameOk ? null : lastName != null ? <Text style={styles.textError}> נא להקליד שנית </Text> : <Text style={styles.textError}> סעיף זה חובה </Text>}
+      {lastNameOk ? null : lastName != "" ? <ErrorText text=" חייב להכיל אותיות בלבד" /> : <ErrorText text="סעיף זה חובה" />}
       <InputStyle placeHolderText="סיסמא" icon="Entypo" nameOfIcon="lock" func={setPassword} funcForCheck={checkPassword} max={10} />
       {passwordOk ? null : <Text style={styles.textError}> נא להקליד שנית </Text>}
       <InputStyle placeHolderText="טלפון" icon="Entypo" nameOfIcon="phone" func={setPhone} funcForCheck={checkPhoneNumber} max={10} />

@@ -6,20 +6,28 @@ import CalendarBoard from './CalendarBoard';
 import ButtonCustom from '../ComponentStyle/ButtonCustom'
 import InputStyle from '../ComponentStyle/InputStyle'
 //import DateTimePicker from '@react-native-community/datetimepicker';
+import { DatePicker } from "react-native-common-date-picker";
 
-const StageTwoRegi = ({ checkAndMove ,openCameraStageTwo}) => {
+const StageTwoRegi = ({ checkAndMove, setOpenCamera }) => {
 
-  const [date, setDate] = useState();
-  const [open, openCalendar] = useState(false)
-
+  const [date, setDate] = useState({
+      dateChose:'',
+      visible:false
+  });
+ 
   const [birthdate, setBirthdate] = useState(new Date());
   const [openCalendarP, setOpenCalendar] = useState(false)
+
 
   const [checkedM, setCheckedM] = useState(true);
 
   const [email, setEmail] = useState();
 
-  const [openCamera,setOpenCamera] = useState(false)
+  // const [openCamera,setOpenCamera] = useState(false)
+
+  var maxDate = new Date();
+  maxDate.setFullYear((new Date().getFullYear() - 18))
+
 
   const [adress, setAdress] = useState();
   const [iD, setID] = useState();
@@ -27,9 +35,6 @@ const StageTwoRegi = ({ checkAndMove ,openCameraStageTwo}) => {
   const [emailOk, setEmailOk] = useState();
   const [idOk, setIdOk] = useState();
 
-  useEffect(() => {
-    openCalendar(false)
-  }, [date])
 
   const checkEmails = () => {
     if (email == null) {
@@ -53,57 +58,6 @@ const StageTwoRegi = ({ checkAndMove ,openCameraStageTwo}) => {
   const checkBirthday = () => {
 
   }
-
-
-  // let photo = await this.camera.takePictureAsync({
-  //   quality: 0.1,
-  //   base64: true,
-  // });
-  // this.setState({
-  //   pic64base: photo.base64,
-  //   picName64base: 'image1_' + new Date().getTime() + '.jpg',
-  //   picUri: `data:image/gif;base64,${photo.base64}`,
-  // });
-
-  // uploadBase64ToASMX = () => {
-  //   this.setState({ animate: true });
-  //   let urlAPI =
-  //     'http://ruppinmobile.tempdomain.co.il/site01/webservice.asmx/ImgUpload';
-  //   fetch(urlAPI, {
-  //     method: 'POST',
-  //     body: JSON.stringify({
-  //       base64img: this.state.pic64base,
-  //       base64imgName: this.state.picName64base,
-  //     }
-
-  //     )
-  //   }
-  //   let photo = await this.camera.takePictureAsync({ quality: 0.7 });
-
-  //   const config = {
-  //     method: 'POST',
-  //     body: dataI,
-  //   }
-
-  //   fetch(urlAPI, config)
-  //     .then((res) => {
-  //       if (res.status == 201) { return res.json(); }
-  //       else { return "err"; }
-  //     })
-  //     .then((responseData) => {
-  //       if (responseData != "err") {
-  //         let picNameWOExt = picName.substring(0, picName.indexOf("."));
-  //         let imageNameWithGUID = responseData.substring(responseData.indexOf(picNameWOExt),
-  //           responseData.indexOf(".jpg") + 4);
-  //         this.setState({
-  //           uplodedPicUri: { uri: this.uplodedPicPath + imageNameWithGUID },
-  //         });
-  //         console.log("img uploaded successfully!");
-  //       }
-  //       else { alert('error uploding ...'); }
-  //     })
-  //     .catch(err => { alert('err upload= ' + err); });
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -146,19 +100,59 @@ const StageTwoRegi = ({ checkAndMove ,openCameraStageTwo}) => {
 
 
 
-      <TouchableOpacity onPress={() => openCalendar(true)}>
-        <InputStyle placeHolderText="תאריך לידה" icon="Ionicons" nameOfIcon="calendar" func={setBirthdate} funcForCheck={checkBirthday}
-          value={date} />
+      <TouchableOpacity onPress={() => setDate({visible:true})}>
+        <InputStyle placeHolderText="תאריך לידה" icon="Ionicons" nameOfIcon="calendar" func={null} funcForCheck={checkBirthday}
+          value={date.dateChose} />
         {true ? null : <Text> נא לבחור תאריך </Text>}
       </TouchableOpacity>
 
-      {open ? (
+      <Modal visible={date.visible}>
+        <View style={styles.modalContainer}>
+          <View style={styles.boxModal}>
+            <DatePicker    
+              confirm={date => {             
+                setDate({
+                  dateChose:date,
+                  visible:false
+                })
+                console.warn(date)
+              }}
+              cancel={()=> setDate({visible:false})}
+              type='DD-MM-YYYY'
+              minDate='1925-01-01'
+              maxDate={maxDate}
+              toolBarPosition='bottom'
+              toolBarStyle={{
+                width: '60%',
+                alignSelf: 'center',
+                borderWidth: 0,
+                
+              }}
+              toolBarCancelStyle={{
+                color: '#52B69A',
+                fontWeight: 'bold'
+              }}
+              toolBarConfirmStyle={{
+                color: '#52B69A',
+                fontWeight: 'bold'
+              }}
+              confirmText='אישור'
+              cancelText='חזור'
+              selectedTextColor='#52B69A'
+              selectedBorderLineColor='#52B69A'
+            />
+          </View>
+        </View>
+      </Modal>
+
+
+      {/* {open ? (
         <View style={styles.boxModal} >
           <TouchableOpacity styles={styles.modalS} onPressOut={() => openCalendar(false)}>
             <CalendarBoard setDate={setDate} />
           </TouchableOpacity >
         </View>
-      ) : null}
+      ) : null} */}
 
 
       <InputStyle placeHolderText="תעודת זהות" icon="FontAwesome" nameOfIcon="id-card" func={checkId} funcForCheck={checkId} max={9} />
@@ -166,18 +160,19 @@ const StageTwoRegi = ({ checkAndMove ,openCameraStageTwo}) => {
 
 
       <View style={styles.btnBox}>
-        <TouchableOpacity style={styles.btnStyle} onPress={()=> {{  
-                openCameraStageTwo()
+        <TouchableOpacity style={styles.btnStyle} onPress={() => {
+          {
+            setOpenCamera(true)
           }
         }}>
           <Text> העלאת תמונה </Text>
           <Entypo name="upload" size={18} color="#F8B11C" />
         </TouchableOpacity>
       </View>
-      
-       
 
-      <ButtonCustom textInBtn="המשך" func={checkAndMove} /> 
+
+
+      <ButtonCustom textInBtn="המשך" func={checkAndMove} />
 
     </SafeAreaView>
 
@@ -213,24 +208,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  modalS: {
-    margin: 20,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    zIndex: 1,
-
-  },
   boxModal: {
     position: "absolute",
     zIndex: 1,
+    borderColor: 'black',
+    borderWidth: 1,
+    padding:5,
+
   },
+  modalContainer:{
+    height: '100%',
+    width: '100%',
+    justifyContent: 'center',
+  }
 
 
 

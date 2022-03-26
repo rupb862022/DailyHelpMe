@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ScrollView, VirtualizedList  } from 'react-native'
 import React, { useState, useEffect } from 'react';
 import { List } from 'react-native-paper';
-import { backgroundColor } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes';
 import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView, SafeAreaProvider, InitialWindowMetrics } from "react-native-safe-area-context";
 
 const HomePage = () => {
 
@@ -10,8 +10,8 @@ const HomePage = () => {
 
   const handlePress = () => setExpanded(!expanded);
 
-  const [request, setRequest] = useState({
-
+  const [request, setRequest] = useState([{
+    RequestCode: '123',
     RequestName: 'קשיש זקוק לעזרה',
     VolunteerType: [
       {
@@ -29,6 +29,7 @@ const HomePage = () => {
     Image: '',
     Tasks: [
       {
+        TaskNumber: '1',
         TaskName: 'הבאת קניות מהסופר',
         TaskHour: '15:00',
         StartDate: '06/02/22',
@@ -37,6 +38,7 @@ const HomePage = () => {
         Confirmation: true,
       },
       {
+        TaskNumber: '2',
         TaskName: 'ביקור של שעה',
         TaskHour: '18:00',
         StartDate: '06/02/22',
@@ -45,11 +47,51 @@ const HomePage = () => {
         Confirmation: true,
       },
     ]
-  });
+  },
+  {
+    RequestCode: '124',
+    RequestName: 'קשיש זקוק מאוד לעזרה',
+    VolunteerType: [
+      {
+        VolunteerName: 'עזרה'
+      },
+      {
+        VolunteerName: 'כלום'
+      },
+      {
+        VolunteerName: 'שום דבר'
+      }],
+    City: 'נתניה',
+    StartDate: '06/02/22',
+    EndDate: '08/02/22',
+    Image: '',
+    Tasks: [
+      {
+        TaskNumber: '1',
+        TaskName: 'הבאת קניות מהסופר',
+        TaskHour: '15:00',
+        StartDate: '06/02/22',
+        EndDate: '06/02/22',
+        TaskDescription: 'סיוע לאדם מבוגר בהבאת הקניות מהסופר',
+        Confirmation: true,
+      },
+      {
+        TaskNumber: '2',
+        TaskName: 'ביקור של שעה',
+        TaskHour: '18:00',
+        StartDate: '06/02/22',
+        EndDate: '08/02/22',
+        TaskDescription: 'נשמח אם יגיעו לשמח את סבא כשאנחנו בחו"ל',
+        Confirmation: true,
+      },
+    ]
+  },
+
+  ]);
 
   useEffect(() => {
     const apiUrl = 'https://localhost:44389/api/HomePage/'
-     
+
     fetch(apiUrl, {
       method: 'POST',
       body: JSON.stringify({
@@ -72,55 +114,82 @@ const HomePage = () => {
           console.log("err post=", error);
         });
   }, [])
- 
 
-  return (
-    <View style={styles.container}>
-      <List.Section >
-        <List.Accordion
-          title={
+
+
+  const renderItem = ({ item }) => (
+    <List.Accordion
+      style={{
+        width: '100%',
+      }}
+      title={
+        <View>
+          <View style={{
+            flexDirection: 'row',
+            width: '100%',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+          }}>
             <View>
-              <View style={{
-                flexDirection: 'row',
-                width: '100%',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-              }}>
-                <View>
-                  <Text style={styles.title}> {request.RequestName} </Text>
-                  <Text style={styles.text}> {request.VolunteerType[0].VolunteerName} | {request.VolunteerType[1].VolunteerName} | {request.VolunteerType[2].VolunteerName}</Text>
-                </View>
-                <View>
-                  <Image style={styles.img} source={require('../../assets/Facebook.png')} />
-                </View>
-              </View>
-              <View style={{
-                flexDirection: 'row',
-                width: '80%',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 15,
-              }}>
-                <Text style={{ flex: 5 }}> {request.StartDate} - {request.EndDate} </Text>
-                <Text style={{ flex: 1 }}>    {request.City} </Text>
-                <Ionicons style={{ flex: 1 }} name="location" size={24} color="#F8B11C" />
-              </View>
+              <Text style={styles.title}> {item.RequestName} </Text>
+              <Types types={item.VolunteerType} />
             </View>
-          }
-          titleStyle={{
-            alignSelf: 'flex-end'
-          }}
-          right={() => { null }} >
+            <View>
+              <Image style={styles.img} source={require('../../assets/Facebook.png')} />
+            </View>
+          </View>
+          <View style={{
+            flexDirection: 'row',
+            width: '80%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 15,
+          }}>
+            <Text style={{ flex: 5 }}> {item.StartDate} - {item.EndDate} </Text>
+            <Text style={{ flex: 1 }}>    {item.City} </Text>
+            <Ionicons style={{ flex: 1 }} name="location" size={24} color="#F8B11C" />
+          </View>
+        </View>
+      }
+      titleStyle={{
+        alignSelf: 'flex-end'
+      }}
+      right={() => { null }} >
+      <Tasks tasks={item.Tasks} />
+    </List.Accordion>
+  )
+
+  const Types = ({ types }) => (
+    <View >
+      <FlatList
+        style={styles.row}
+        data={types}
+        keyExtractor={item => item.VolunteerName}
+        renderItem={({ item }) => {
+          return <Text style={styles.text}> {item.VolunteerName} </Text>
+        }}
+      />
+    </View>
+  )
+
+  const Tasks = ({ tasks }) => (
+    <FlatList
+      data={tasks}
+      listKey={(item, index) => (item.TaskNumber + index).toString()}
+      keyExtractor={(item, index) => (index).toString()}
+      renderItem={({ item }) => {
+        return (
           <List.Item
-            title={request.Tasks[0].TaskName}
+            style={{backgroundColor:'#dedfe1'}}
+            title={item.TaskName}
             description={
               <View style={{ width: '100%', justifyContent: 'center' }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text > תאריך {request.Tasks[0].EndDate} </Text>
-                  <Text >  בשעה {request.Tasks[0].TaskHour} </Text>
+                  <Text> תאריך {item.EndDate} </Text>
+                  <Text>  בשעה {item.TaskHour} </Text>
                 </View>
                 <View >
-                  <Text style={{ alignSelf: 'flex-end', marginTop: 5, }}>  {request.Tasks[0].TaskDescription} </Text>
+                  <Text style={{ alignSelf: 'flex-end', marginTop: 5, }}>  {item.TaskDescription} </Text>
                 </View>
                 <View>
                   <TouchableOpacity style={styles.btnS} >
@@ -130,58 +199,52 @@ const HomePage = () => {
               </View>
             }
             descriptionStyle={{
-              width:'100%',
-              textAlign: 'right',
-            }}
-            titleStyle={{        
-              fontWeight: 'bold',
-              fontSize:16,
-              width:'100%',
-              textAlign: 'right'
-            }}
-          />
-          <List.Item title={request.Tasks[1].TaskName}
-            description={
-              <>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                  <Text> תאריך {request.Tasks[1].EndDate} </Text>
-                  <Text>  בשעה {request.Tasks[1].TaskHour} </Text>
-                </View>
-                <View>
-                  <Text>  {request.Tasks[1].TaskDescription} </Text>
-                </View>
-              </>
-            }
-            descriptionStyle={{
               width: '100%',
               textAlign: 'right',
             }}
             titleStyle={{
-              alignSelf: 'flex-end'
+              fontWeight: 'bold',
+              fontSize: 16,
+              width: '100%',
+              textAlign: 'right'
+            }}
+          />)
+      }}
+    />
+  )
+
+  return (
+    <SafeAreaProvider  style={styles.container}>
+      <View >
+        <List.Section>
+          <FlatList          
+            scrollEnabled={true}     
+            data={request}
+            renderItem={renderItem}
+            keyExtractor={item => item.RequestCode}
+            ItemSeparatorComponent={() => {
+              return <View style={{ backgroundColor: "#52B69A", height: 5 }} />
             }}
           />
-
-        </List.Accordion>
-
-        <List.Accordion
-          title="Controlled Accordion"
-          left={props => <List.Icon {...props} icon="folder" />}
-          expanded={expanded}
-          onPress={handlePress}>
-          <List.Item title="First item" />
-          <List.Item title="Second item" />
-        </List.Accordion>
-      </List.Section>
-    </View>
+        </List.Section>
+      </View>
+    </SafeAreaProvider >
   )
+
 }
 
 export default HomePage
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'flex-end',
-    width:'100%',
+   
+    width: '100%',
+    height: '85%',
+    alignSelf: 'flex-start',
+  
+  },
+  row: {
+    flexDirection: 'row',
   },
   img: {
     borderRadius: 40,

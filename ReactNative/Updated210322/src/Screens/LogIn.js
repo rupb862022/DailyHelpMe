@@ -95,7 +95,7 @@ const LogIn = ({ navigation }) => {
 
 
   return (
-    <ScrollView >
+
       <SafeAreaView style={[styles.container, styles.flexStyle]} >
         <View>
           <Image style={styles.imgStyle} source={require('../../assets/LogoReg.png')} />
@@ -135,7 +135,7 @@ const LogIn = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-    </ScrollView>
+  
 
   );
 };

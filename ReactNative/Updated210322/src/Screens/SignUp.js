@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView } from 'react-native'
+import { StyleSheet, Modal,Text, View, TouchableOpacity, SafeAreaView } from 'react-native'
 import React, { useEffect, useState } from 'react';
 import StageOneRegi from '../Components/StageOneRegi';
 import StageTwoRegi from '../Components/StageTwoRegi';
@@ -33,6 +33,8 @@ const SignUp = ({ navigation }) => {
 
   const [user, setUser] = useState([]);
   const [OpenCamera, setOpenCamera] = useState()
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   useFocusEffect(() => {
     navigation.setOptions({ tabBarStyle: { display: 'none' } });
@@ -71,7 +73,6 @@ const SignUp = ({ navigation }) => {
         return;
       default:
         return;
-
     }
   }
 
@@ -81,7 +82,7 @@ const SignUp = ({ navigation }) => {
         setStage(<StageOneRegi checkAndMove={checkAndMove} />)
         return;
       case 2:
-        setStage(<StageTwoRegi openCameraStageTwo={openCameraStageTwo} />)
+        setStage(<StageTwoRegi setOpenCamera={setModalVisible} />)
         setStageTwo(true)
         return;
       case 3:
@@ -93,13 +94,24 @@ const SignUp = ({ navigation }) => {
     }
   }, [formNum])
 
-  const openCameraStageTwo = () => {
-    console.log("entered")
-    return <CameraUpload />
-  }
+
 
   return (
     <SafeAreaView>
+     <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {     
+          setModalVisible(!modalVisible);
+        }}
+        style={{width:100,height:'100%'}}
+        
+      >
+      <View style={styles.ModalBox}>
+      <CameraUpload/>
+      </View>
+      </Modal>
       <View style={styles.container}>
           <View style={styles.btnBox}>
             <TouchableOpacity
@@ -172,7 +184,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#7BC9B3',
     padding: 10,
     width: '100%',
-
+  },
+  ModalBox:{
+    width: '100%',
+    height: '100%',
   }
 
 })
