@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="701c1b45a1bd4d2d96d824d6bf425f56" Name="Diagram1">
+        <EntityTypeShape EntityType="bgroup86_prodModel.City" Width="1.5" PointX="0.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.InterestedIn" Width="1.5" PointX="8" PointY="13.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.InterestedInRegistered" Width="2.5" PointX="13" PointY="10.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.RegisteredTo" Width="1.5" PointX="12.375" PointY="7" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.Report" Width="1.5" PointX="10.5" PointY="11.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.ReportType" Width="1.5" PointX="13.375" PointY="12.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.Request" Width="1.5" PointX="7.5" PointY="9.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.Street" Width="1.5" PointX="3" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.Task" Width="1.75" PointX="9.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.Topic" Width="1.5" PointX="11.375" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.Users" Width="1.875" PointX="4.5" PointY="10.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.VolunteerType" Width="1.5" PointX="5.375" PointY="5.875" IsExpanded="true" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Street__CityCode__035179CE" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Intereste__Volun__5B0E7E4A" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__InterestedIn__ID__5C02A283" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Intereste__TaskN__546180BB" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__InterestedIn__ID__536D5C82" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Registere__TaskN__442B18F2" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__RegisteredTo__ID__4336F4B9" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Report__IDUserMa__1293BD5E" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Report__IDUserRe__1387E197" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Report__ReportTy__119F9925" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Request__38B96646" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Request__ID__35DCF99B" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Task__RequestCod__3F6663D5" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Users__0DCF0841" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Topic__TaskNumbe__5832119F" ManuallyRouted="false" />
+        <AssociationConnector Association="bgroup86_prodModel.FK__Topic__Volunteer__573DED66" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
