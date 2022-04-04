@@ -12,7 +12,6 @@ using WebApplication.Models;
 
 namespace WebApplication.Controllers
 {
-    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class HomePageController : ApiController
     {
 

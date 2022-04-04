@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Text;
 using System.Security.Cryptography;
+using System.Data.Entity.Validation;
+using System.Data.Entity.Infrastructure;
 
 namespace WebApplication.Controllers
 {
@@ -97,10 +99,18 @@ namespace WebApplication.Controllers
 
                 return Ok("OK");
             }
-            catch (Exception ex)
+            catch (DbEntityValidationException e)
             {
-                return Content(HttpStatusCode.NotFound, ex.Message);
+                return Content(HttpStatusCode.BadRequest, e.Message);
             }
+            catch (DbUpdateException e)
+            {
+                return Content(HttpStatusCode.BadRequest, e.Message);
+            }
+            catch (Exception e)
+            {
+                return Content(HttpStatusCode.BadRequest, e.Message);
+            }    
         }
 
 

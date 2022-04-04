@@ -8,13 +8,15 @@ using DailyHelpMe;
 using WebApplication.Models;
 using WebApplication.Controllers;
 using WebApplication.Dto;
+using System.Data.Entity.Validation;
+using System.Data.Entity.Infrastructure;
 
 namespace WebApplication.Controllers
 {
     public class AddRequestController : ApiController
     {
 
-        [Route("AddCity")]
+        [Route("addCity")]
         [HttpPost]
         public IHttpActionResult Post([FromBody] string cityName)
         {
@@ -53,9 +55,17 @@ namespace WebApplication.Controllers
                 return Ok("OK");
 
             }
-            catch (Exception)
+            catch (DbEntityValidationException e)
             {
-                return NotFound();
+                return Content(HttpStatusCode.BadRequest, e.Message);
+            }
+            catch (DbUpdateException e)
+            {
+                return Content(HttpStatusCode.BadRequest, e.Message);
+            }
+            catch (Exception e)
+            {
+                return Content(HttpStatusCode.BadRequest, e.Message);
             }
         }
 
@@ -74,9 +84,17 @@ namespace WebApplication.Controllers
 
                 return Ok(regi);
             }
-            catch (Exception)
+            catch (DbEntityValidationException e)
             {
-                return NotFound();
+                return Content(HttpStatusCode.BadRequest, e.Message);
+            }
+            catch (DbUpdateException e)
+            {
+                return Content(HttpStatusCode.BadRequest, e.Message);
+            }
+            catch (Exception e)
+            {
+                return Content(HttpStatusCode.BadRequest, e.Message);
             }
         }
 
@@ -92,11 +110,19 @@ namespace WebApplication.Controllers
 
                 db.SaveChanges();
 
-                return Ok("OK");
+                return Ok(regi);
             }
-            catch (Exception)
+            catch (DbEntityValidationException e)
             {
-                return NotFound();
+                return Content(HttpStatusCode.BadRequest, e.Message);
+            }
+            catch (DbUpdateException e)
+            {
+                return Content(HttpStatusCode.BadRequest, e.Message);
+            }
+            catch (Exception e)
+            {
+                return Content(HttpStatusCode.BadRequest, e.Message);
             }
         }
 
@@ -117,7 +143,6 @@ namespace WebApplication.Controllers
                     db.InterestedInRegistered.Remove(taskToCancel);
                     db.SaveChanges();
                     return Ok("OK");
-
                 } 
                 
                 RegisteredTo taskToCancell = db.RegisteredTo.Where(x => x.ID == taskCancel.ID).FirstOrDefault(x => x.TaskNumber == taskCancel.TaskNumber);
@@ -131,9 +156,17 @@ namespace WebApplication.Controllers
 
                 return Ok("NO");
             }
-            catch (Exception)
+            catch (DbEntityValidationException e)
             {
-                return NotFound();
+                return Content(HttpStatusCode.BadRequest, e.Message);
+            }
+            catch (DbUpdateException e)
+            {
+                return Content(HttpStatusCode.BadRequest, e.Message);
+            }
+            catch (Exception e)
+            {
+                return Content(HttpStatusCode.BadRequest, e.Message);
             }
         }
     }
