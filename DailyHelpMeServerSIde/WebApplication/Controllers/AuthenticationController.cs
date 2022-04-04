@@ -99,18 +99,10 @@ namespace WebApplication.Controllers
 
                 return Ok("OK");
             }
-            catch (DbEntityValidationException e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.Message);
-            }
-            catch (DbUpdateException e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.Message);
-            }
             catch (Exception e)
             {
-                return Content(HttpStatusCode.BadRequest, e.Message);
-            }    
+                return Content(HttpStatusCode.BadRequest, e.GetType());
+            }
         }
 
 

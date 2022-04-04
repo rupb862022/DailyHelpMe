@@ -54,18 +54,10 @@ namespace WebApplication.Controllers
 
                 return Ok("OK");
 
-            }
-            catch (DbEntityValidationException e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.Message);
-            }
-            catch (DbUpdateException e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.Message);
-            }
+            }       
             catch (Exception e)
             {
-                return Content(HttpStatusCode.BadRequest, e.Message);
+                return Content(HttpStatusCode.BadRequest, e.GetType());
             }
         }
 
@@ -84,17 +76,9 @@ namespace WebApplication.Controllers
 
                 return Ok(regi);
             }
-            catch (DbEntityValidationException e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.Message);
-            }
-            catch (DbUpdateException e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.Message);
-            }
             catch (Exception e)
             {
-                return Content(HttpStatusCode.BadRequest, e.Message);
+                return Content(HttpStatusCode.BadRequest, e.GetType());
             }
         }
 
@@ -111,18 +95,10 @@ namespace WebApplication.Controllers
                 db.SaveChanges();
 
                 return Ok(regi);
-            }
-            catch (DbEntityValidationException e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.Message);
-            }
-            catch (DbUpdateException e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.Message);
-            }
+            }   
             catch (Exception e)
             {
-                return Content(HttpStatusCode.BadRequest, e.Message);
+                return Content(HttpStatusCode.BadRequest, e.GetType());
             }
         }
 
@@ -156,17 +132,9 @@ namespace WebApplication.Controllers
 
                 return Ok("NO");
             }
-            catch (DbEntityValidationException e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.Message);
-            }
-            catch (DbUpdateException e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.Message);
-            }
             catch (Exception e)
             {
-                return Content(HttpStatusCode.BadRequest, e.Message);
+                return Content(HttpStatusCode.BadRequest, e.GetType());
             }
         }
     }
