@@ -78,7 +78,7 @@ const SignUp = ({ navigation }) => {
     console.log(json)
     switch (numOfStage) {
       case '1':
-        let token = JSON.stringify(await registerForPushNotificationsAsync());
+        let token = await registerForPushNotificationsAsync();
         console.log("token: ", token)
         setUser({
           ...user,

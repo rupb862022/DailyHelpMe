@@ -2,9 +2,9 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ScrollView, 
 import React, { useState, useEffect } from 'react';
 import { List } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView, SafeAreaProvider, InitialWindowMetrics } from "react-native-safe-area-context";
+import {SafeAreaProvider } from "react-native-safe-area-context";
 import moment from 'moment';
-import { getRequests, signToTaskConfirm, signToTask, getTypes,getRequestsSorted } from '../FetchCalls/homePageAPI';
+import { getRequests, signToTaskConfirm, signToTask, getTypesName, getRequestsSorted, cancelTask } from '../FetchCalls/homePageAPI';
 import SelectDropdown from 'react-native-select-dropdown'
 import * as Location from 'expo-location';
 
@@ -13,21 +13,23 @@ const HomePage = ({ navigation }) => {
   const ID = "208445452"
   const [request, setRequest] = useState([])
 
-  const [typeList, setListOfTypes] = useState(["סיוע לקשישים", "ביקורים", "בישול"])
+  const [typeList, setListOfTypes] = useState([])
 
-  const [locationList, setLocationList] = useState(["באיזור שלי", "בעיר שלי"])
+  const [locationList, setLocationList] = useState(["בחר", "באיזור שלי", "בעיר שלי"])
 
-  const [sortByType, setSortByType] = useState();
-  const [sortByLocation, setSortByLocation] = useState();
+  const [sortBy, setSortBy] = useState({
+    sortByType: null,
+    sortByLocation: null
+  })
 
   const [userLocation, setUserLocation] = useState({
-    Lat: '',
-    Lng: '',
-    CityName: '',
+    Lat: null,
+    Lng: null,
+    CityName: null,
   })
 
   useEffect(() => {
-    getTypes().then(
+    getTypesName().then(
       (result) => {
         console.log("get types in Home Page successfully: ", result)
         setListOfTypes(result)
@@ -36,109 +38,148 @@ const HomePage = ({ navigation }) => {
         console.log("get types in home page Failed=", error);
       });
 
-      getRequests(ID).then(
+    getRequests(ID).then(
       (result) => {
         setRequest(result);
       },
       (error) => {
         console.log("get request didnt work = ", error);
       });
-
   }, [])
 
-
   useEffect(async () => {
-    console.log(sortByLocation)
-   
+    // console.log(location)
+    // let reverseGC = await Location.reverseGeocodeAsync(location.coords);
+    // console.log("yoooo", reverseGC);
+
+    console.log("hiiiiiiiiiiiiiiiiiiiiiiiiii");
+    var config;
+    if (sortBy.sortByLocation == "בחר" && sortBy.sortByType == "כל התחומים") {
+      getRequests(ID).then(
+        (result) => {
+          setRequest(result);
+        },
+        (error) => {
+          console.log("get request didnt work = ", error);
+        });
+      return;
+    }
+    if (sortBy.sortByLocation == "באיזור שלי") {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         console.log('Permission to access location was denied');
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
-      setUserLocation({
-        CityName:null,
+       setUserLocation({
+        CityName: null,
         Lat: location.coords.latitude,
         Lng: location.coords.longitude
       });
-      console.log(location)
-      let reverseGC = await Location.reverseGeocodeAsync(location.coords);
-      console.log("yoooo", reverseGC.city);
 
-      ///if chose = "by location": send only... 
-
-      getRequestsSorted({
-        CurrentLocation: userLocation,
+      config = {
+        CurrentLocation: {
+          Lat: userLocation.Lat,
+          Lng: userLocation.Lng,
+          CityName: null,
+        },
         VolunteerCode: 0,
         ID: ID,
-      }).then(
+      }
+    }
+    else if ("בעיר שלי") {
+      config = {
+        CurrentLocation: {
+          Lat: null,
+          Lng: null,
+          CityName: "נתניה",
+        },
+        VolunteerCode: 0,
+        ID: ID,
+      }
+    }
+    else if (sortBy.sortByType != null) {
+      config = {
+        CurrentLocation: {
+          Lat: null,
+          Lng: null,
+          CityName: "נתניה",
+        },
+        VolunteerName: sortBy.sortByType,
+        ID: ID,
+      }
+    }
+
+    getRequestsSorted(config)
+      .then(
         (result) => {
           console.log("get sorted requests in Home Page successfully: ", result)
-          //setRequest(request)
+          setRequest(request)
         },
         (error) => {
           console.log("get sorted request Failed=", error);
         });
 
-  }, [sortByLocation,sortByType]);
-  
+  }, [sortBy]);
+
   const signUserToTask = (Task) => {
+    console.log("tried to sign!")
+    console.log(Task);
 
-    var text = {};
-
-    if (Task.Confirmation) {
-      signToTask({
-        ID: { ID },
-        TaskNumber: Task.TaskNumber,
-      }).then(
-        (result) => {
-          console.log("Signed To Task Without confirmation: ", result)
-          if (result == OK) {
-            //do something if signed successfully
-          }
-        },
-        (error) => {
-          console.log("err post=", error);
-        });
-    }
-    else {
-
-      text = {
-        title: 'קיים שיבוץ חדש',
-        body: 'יש לרשותך 24 שעות לאשר',
+    if (Task.Status == "sign") {
+      if (!Task.Confirmation) {
+        signToTask({
+          ID: ID ,
+          TaskNumber: Task.TaskNumber,
+        }).then(
+          (result) => {
+            console.log("Signed To Task Without confirmation successfully: ", result)
+            Task.Status = "cancel"
+          },
+          (error) => {
+            console.log("Signed To Task Without confirmation error=", error);
+          });
       }
-
-      signToTaskConfirm({
-        ID: { ID },
+      else {
+        console.log(moment())
+        signToTaskConfirm({
+          ID:  ID ,
+          TaskNumber: Task.TaskNumber,
+          SignToTaskTime: moment()
+        }).then(
+          (result) => {
+           
+            console.log("Signed To Task With confirmation: ", result)
+       
+            if (result != null) {
+               Task.Status = "wait"
+               console.log("status",Task.Status)
+               return;
+            }
+          },
+          (error) => {
+            console.log("Signed To Task with confirmation error=", error);
+          });
+      }
+    }
+    else{
+      cancelTask({
+        ID: ID ,
         TaskNumber: Task.TaskNumber,
-        SignToTaskTime: new Date(),
       }).then(
         (result) => {
-          console.log("Signed To Task With confirmation: ", result)
-          if (result == OK) {
-            //do something if signed successfully
+          console.log("cancel registration: ", result)
+          console.log(result)
+          if (result == "OK") {
+            Task.Status = "sign"
           }
         },
         (error) => {
-          console.log("err post=", error);
+          console.log("Signed To Task with confirmation error=", error);
         });
-
     }
-
-    sendNotification(
-      text
-    ).then(
-      (result) => {
-        console.log("Signed To Task Without confirmation: ", result)
-        if (result == OK) {
-          //do something if signed successfully
-        }
-      },
-      (error) => {
-        console.log("err post=", error);
-      });
-
   }
+
 
   const renderItem = ({ item }) => (
     <List.Accordion
@@ -215,8 +256,10 @@ const HomePage = ({ navigation }) => {
                   <TouchableOpacity style={[styles.btnStyle,
                   {
                     backgroundColor: item.Status != "wait" ? "#52B69A" : "#808080",
-                  }]}>
-                    <Text onPress={() => signUserToTask(item)} style={{ textAlign: 'center' }}>  {item.Status != "wait" ? "שיבוץ" : "בטל שיבוץ"} </Text>
+                  }]}
+                    onPress={() => signUserToTask(item)}
+                  >
+                    <Text style={{ textAlign: 'center' }}>  {item.Status != "wait" ? "שיבוץ" : "בטל שיבוץ"} </Text>
                   </TouchableOpacity>
 
                   {item.Status != "wait" ? null : <View style={{ flexDirection: 'row', marginTop: 3, alignSelf: 'center' }}>
@@ -229,7 +272,7 @@ const HomePage = ({ navigation }) => {
             descriptionStyle={{
               width: '100%',
               textAlign: 'right',
-           
+
             }}
             titleStyle={{
               fontWeight: 'bold',
@@ -246,11 +289,14 @@ const HomePage = ({ navigation }) => {
     <SafeAreaProvider style={styles.container}>
       <View style={styles.selectedListBox}>
         <SelectDropdown
-          data={typeList}        
+          data={typeList}
           defaultButtonText="בחירת תחום עניין"
           onSelect={(selectedItem, index) => {
-            console.log("selected: ",selectedItem.VolunteerName)
-            setSortByType(selectedItem.VolunteerName)
+            console.log("selected: ", selectedItem)
+            setSortBy({
+              sortByType: selectedItem,
+              sortByLocation: null
+            })
           }}
           buttonTextAfterSelection={(selectedItem, index) => {
             return selectedItem
@@ -263,7 +309,10 @@ const HomePage = ({ navigation }) => {
           data={locationList}
           defaultButtonText="בחירת מיקום"
           onSelect={(selectedItem, index) => {
-            setSortByLocation(selectedItem)
+            setSortBy({
+              sortByType: null,
+              sortByLocation: selectedItem
+            })
           }}
           buttonTextAfterSelection={(selectedItem, index) => {
             return selectedItem
@@ -275,7 +324,7 @@ const HomePage = ({ navigation }) => {
       </View>
       <View >
         <List.Section>
-          <FlatList       
+          <FlatList           
             initialNumToRender={request.length}
             scrollEnabled={true}
             data={request}

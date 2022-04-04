@@ -17,6 +17,7 @@ export const getTypes=()=>{
 }
 
 export const addUser=(user)=>{
+  console.log("user after stringify: ",JSON.stringify(user))
   return serverFetchAPI('addUser/','POST',JSON.stringify(user));
 }
 

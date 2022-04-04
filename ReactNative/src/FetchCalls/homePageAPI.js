@@ -16,7 +16,7 @@ export const signToTask=(json)=>{
   return serverFetchAPI('signToTask/','POST',JSON.stringify(json));
 }
 
-export const sendNotification=(json)=>{
+export const cancelTask=(json)=>{
   return serverFetchAPI('sendpushnotification/','POST',JSON.stringify(json));
 }
 

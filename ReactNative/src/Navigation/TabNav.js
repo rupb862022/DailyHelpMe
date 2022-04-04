@@ -8,7 +8,6 @@ import AddRequest from '../Screens/AddRequest';
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 

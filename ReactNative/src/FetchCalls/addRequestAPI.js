@@ -8,8 +8,8 @@ export const getTypes=()=>{
   return serverFetchAPI('api/Types/','GET');
 }
 
-export const AddCity=(json)=>{
-  return serverFetchAPI('AddCity','POST',JSON.stringify(json));
+export const addCity=(json)=>{
+  return serverFetchAPI('addCity','POST',JSON.stringify(json));
 }
 
 

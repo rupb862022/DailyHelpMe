@@ -9,7 +9,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import CalendarBoard from '../Components/CalendarBoard';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import moment from 'moment';
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import TimePicker from "react-native-super-timepicker";
 import { addRequest, getTypes, AddCity } from '../FetchCalls/addRequestAPI'
 //import {UserContext} from '../../App'
@@ -230,7 +230,7 @@ const AddRequest = ({ navigation }) => {
           />
 
         </View>
-        <ScrollView nestedScrollEnabled={true}>
+        <ScrollView nestedScrollEnabled={true} keyboardShouldPersistTaps={'handled'}>
           <View style={{ borderTopColor: "#F8B11C", borderTopWidth: 2, marginTop: 15, marginBottom: 10, width: '80%', alignSelf: 'center' }} />
           <View style={{ width: '100%', justifyContent: 'center' }}>
             <Text style={styles.title}> פרטי משימה </Text>
@@ -287,8 +287,16 @@ const AddRequest = ({ navigation }) => {
             <Ionicons name="time" size={25} color="#F8B11C" />
             {time != null ? <Text> {time}</Text> : null}
           </TouchableOpacity>
-          {/* 
-          {open &&  <TimePicker
+          
+         {open? <DateTimePicker mode="time" onChange={(timeGotten)=>{
+           console.log(timeGotten.nativeEvent.timeStamp)
+             setTime(timeGotten.nativeEvent.timeStamp)
+             setTimeOpen(false)
+          }} value={new Date()} is24Hour={true} /> 
+          : null
+        }
+
+          {/* {open &&  <TimePicker
           ref={(ref) => {
             TimePicker = ref;
           }}
