@@ -7,6 +7,8 @@ import moment from 'moment';
 import { getRequests, signToTaskConfirm, signToTask, getTypesName, getRequestsSorted, cancelTask } from '../FetchCalls/homePageAPI';
 import SelectDropdown from 'react-native-select-dropdown'
 import * as Location from 'expo-location';
+import { Button, Paragraph, Dialog, Portal, Provider } from 'react-native-paper';
+
 
 const HomePage = ({ navigation }) => {
 
@@ -27,6 +29,18 @@ const HomePage = ({ navigation }) => {
     Lng: null,
     CityName: null,
   })
+
+
+  const [visible, setVisible] = useState(false);
+
+  const showDialog = () => setVisible(true);
+
+  const hideDialog = () => setVisible(false);
+
+  const [textForDialog, setTextForDialog] = useState({
+    textBody: "",
+    textTitle: "",
+  });
 
   useEffect(() => {
     getTypesName().then(
@@ -129,12 +143,14 @@ const HomePage = ({ navigation }) => {
     if (Task.Status == "sign") {
       if (!Task.Confirmation) {
         signToTask({
-          ID: ID ,
+          ID: ID,
           TaskNumber: Task.TaskNumber,
         }).then(
           (result) => {
             console.log("Signed To Task Without confirmation successfully: ", result)
             Task.Status = "cancel"
+            showDialog()
+            setTextForDialog({ textTitle: "שיבוצך בוצע בהצלחה", textBody: `שיבוצך למשימה ${Task.TaskName} בוצע בהצלחה` })
           },
           (error) => {
             console.log("Signed To Task Without confirmation error=", error);
@@ -143,28 +159,29 @@ const HomePage = ({ navigation }) => {
       else {
         console.log(moment())
         signToTaskConfirm({
-          ID:  ID ,
+          ID: ID,
           TaskNumber: Task.TaskNumber,
           SignToTaskTime: moment()
         }).then(
           (result) => {
-           
+
             console.log("Signed To Task With confirmation: ", result)
-       
-            if (result != null) {
-               Task.Status = "wait"
-               console.log("status",Task.Status)
-               return;
-            }
+
+            Task.Status = "wait"
+            console.log("status", Task.Status)
+            showDialog()
+            setTextForDialog({ textTitle: "שיבוצך בוצע בהצלחה", textBody: `שיבוצך למשימה ${Task.TaskName} ממתין לאישור` })
+            return;
+
           },
           (error) => {
             console.log("Signed To Task with confirmation error=", error);
           });
       }
     }
-    else{
+    else {
       cancelTask({
-        ID: ID ,
+        ID: ID,
         TaskNumber: Task.TaskNumber,
       }).then(
         (result) => {
@@ -172,7 +189,10 @@ const HomePage = ({ navigation }) => {
           console.log(result)
           if (result == "OK") {
             Task.Status = "sign"
+            showDialog()
+            setTextForDialog({textTitle:"שיבוצך בוטל בהצלחה",textBody:`שיבוצך למשימה ${Task.TaskName} בוטל בהצלחה`})
           }
+         
         },
         (error) => {
           console.log("Signed To Task with confirmation error=", error);
@@ -336,6 +356,21 @@ const HomePage = ({ navigation }) => {
             }}
           />
         </List.Section>
+        <Provider>
+        <View>
+          <Portal>
+            <Dialog visible={visible} onDismiss={hideDialog}>
+              <Dialog.Title>{textForDialog.textTitle}</Dialog.Title>
+              <Dialog.Content>
+                <Paragraph>{textForDialog.textBody}</Paragraph>
+              </Dialog.Content>
+              <Dialog.Actions>
+                <Button onPress={hideDialog}>סגור</Button>
+              </Dialog.Actions>
+            </Dialog>
+          </Portal>
+        </View>
+      </Provider>
       </View>
     </SafeAreaProvider >
   )
