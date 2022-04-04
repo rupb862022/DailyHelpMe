@@ -141,6 +141,28 @@ namespace WebApplication.Controllers
 
         }
 
+        [Route("checkIfPhoneUsed")]
+        [HttpPost]
+        public IHttpActionResult CheckPhone([FromBody] string phone)
+        {
+            try
+            {
+                DailyHelpMeDbContext db = new DailyHelpMeDbContext();
+                Users u = db.Users.SingleOrDefault(x => x.MobilePhone == phone);
+
+                if (u == null)
+                {
+                    return Ok(false);
+                }
+                return Ok("מספר זה כבר קיים במערכת");
+            }
+            catch (Exception)
+            {
+                return NotFound();
+            }
+        }
+
+
         [Route("checkIfIDValidOrUsed")]
         [HttpPost]
         public IHttpActionResult PostID([FromBody] string id)
@@ -191,28 +213,7 @@ namespace WebApplication.Controllers
         }
 
 
-        [Route("checkIfPhoneUsed")]
-        [HttpPost]
-        public IHttpActionResult CheckPhone([FromBody] string phone)
-        {
-            try
-            {
-                DailyHelpMeDbContext db = new DailyHelpMeDbContext();
-                Users u = db.Users.SingleOrDefault(x => x.MobilePhone == phone);
-
-                if (u == null)
-                {
-                    return Ok(false);
-                }
-                return Ok("מספר זה כבר קיים במערכת");
-            }
-            catch (Exception)
-            {
-                return NotFound();
-            }
-        }
-
-
+ 
 
         [Route("uploadpicture")]
         public Task<HttpResponseMessage> Post()

@@ -10,15 +10,10 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "@dev-event/react-native-accordion": "^2.0.4",
-    "@mrcluc/react-native-accordion": "^2.0.10",
     "@react-native-community/datetimepicker": "^4.0.0",
     "@react-navigation/bottom-tabs": "^6.2.0",
     "@react-navigation/native": "^6.0.8",
     "@react-navigation/native-stack": "^6.5.2",
-    "@rneui/base": "github:react-native-elements/react-native-elements#base",
-    "@rneui/themed": "github:react-native-elements/react-native-elements#themed",
-    "accordion-collapse-react-native": "^1.1.0",
     "expo": "~44.0.0",
     "expo-camera": "^12.1.2",
     "expo-clipboard": "~2.1.0",
@@ -33,7 +28,6 @@
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-native": "^0.64.3",
-    "react-native-accordion": "^1.0.1",
     "react-native-calendars": "^1.1280.0",
     "react-native-common-date-picker": "^2.3.7",
     "react-native-date-picker": "^4.2.0",
