@@ -12,8 +12,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Text;
 using System.Security.Cryptography;
-using System.Data.Entity.Validation;
-using System.Data.Entity.Infrastructure;
 
 namespace WebApplication.Controllers
 {
@@ -96,7 +94,6 @@ namespace WebApplication.Controllers
                     }
                     db.SaveChanges();
                 }
-
                 return Ok("OK");
             }
             catch (Exception e)
@@ -105,9 +102,8 @@ namespace WebApplication.Controllers
             }
         }
 
-
         static string ComputeSha256Hash(string password)
-        {        
+        {       
             using (SHA256 sha256Hash = SHA256.Create())
             {
                 // ComputeHash - returns byte array  
@@ -122,7 +118,6 @@ namespace WebApplication.Controllers
                 return builder.ToString();
             }
         }
-
 
         [Route("checkIfEmailUsed")]
         [HttpPost]

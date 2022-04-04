@@ -25,7 +25,7 @@ namespace WebApplication
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             //code for timer
-            timer.Interval = 60 * 60 * 1000;
+            timer.Interval = 1000;
             timer.Elapsed += tm_Tick;
             path = Server.MapPath("/");
         }

@@ -6,15 +6,15 @@
     <edmx:Diagrams>
       <Diagram DiagramId="cc5185cbdd07424684626e23d465599e" Name="Diagram1">
         <EntityTypeShape EntityType="bgroup86_prodModel.City" Width="1.5" PointX="5" PointY="6.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="bgroup86_prodModel.InterestedInRegistered" Width="1.5" PointX="9.625" PointY="8.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.InterestedInRegistered" Width="1.5" PointX="10.25" PointY="8.25" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.RegisteredTo" Width="1.5" PointX="11.5" PointY="11.125" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.Report" Width="1.5" PointX="2.875" PointY="11.5" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.ReportType" Width="1.5" PointX="6" PointY="12.75" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.Request" Width="1.5" PointX="5.125" PointY="9.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="bgroup86_prodModel.Task" Width="1.5" PointX="7.5" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.Task" Width="1.75" PointX="7.5" PointY="6" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.TaskTypes" Width="1.5" PointX="10.125" PointY="5.875" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.Users" Width="1.5" PointX="2.75" PointY="5.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="bgroup86_prodModel.VolTypesPreferences" Width="1.5" PointX="8.375" PointY="11.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.VolTypesPreferences" Width="2" PointX="8.375" PointY="11.375" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.VolunteerType" Width="1.5" PointX="12.375" PointY="7.625" IsExpanded="true" />
         <AssociationConnector Association="bgroup86_prodModel.FK__Request__CityCod__40257DE4" ManuallyRouted="false" />
         <AssociationConnector Association="bgroup86_prodModel.FK__Task__CityCode__5F9E293D" ManuallyRouted="false" />

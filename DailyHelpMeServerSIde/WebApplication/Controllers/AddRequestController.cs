@@ -39,7 +39,6 @@ namespace WebApplication.Controllers
         }
 
 
-
         [Route("addRequest")]
         [HttpPost]
         public IHttpActionResult Post([FromBody] Request request)
@@ -62,80 +61,5 @@ namespace WebApplication.Controllers
         }
 
 
-        [Route("signToTaskConfirm")]
-        [HttpPost]
-        public IHttpActionResult Post([FromBody] InterestedInRegistered regi)
-        {
-            try
-            {
-                DailyHelpMeDbContext db = new DailyHelpMeDbContext();
-
-                db.InterestedInRegistered.Add(regi);
-
-                db.SaveChanges();
-
-                return Ok(regi);
-            }
-            catch (Exception e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.GetType());
-            }
-        }
-
-        [Route("signToTask")]
-        [HttpPost]
-        public IHttpActionResult Post([FromBody] RegisteredTo regi)
-        {
-            try
-            {
-                DailyHelpMeDbContext db = new DailyHelpMeDbContext();
-
-                db.RegisteredTo.Add(regi);
-
-                db.SaveChanges();
-
-                return Ok(regi);
-            }   
-            catch (Exception e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.GetType());
-            }
-        }
-
-
-
-        [Route("cancelTask")]
-        [HttpDelete]
-        public IHttpActionResult Delete([FromBody] CancelTask taskCancel)
-        {
-            try
-            {
-                DailyHelpMeDbContext db = new DailyHelpMeDbContext();
-
-                InterestedInRegistered taskToCancel = db.InterestedInRegistered.Where(x => x.ID == taskCancel.ID).FirstOrDefault(x => x.TaskNumber == taskCancel.TaskNumber);
-
-                if (taskToCancel != null)
-                {
-                    db.InterestedInRegistered.Remove(taskToCancel);
-                    db.SaveChanges();
-                    return Ok("OK");
-                } 
-                
-                RegisteredTo taskToCancell = db.RegisteredTo.Where(x => x.ID == taskCancel.ID).FirstOrDefault(x => x.TaskNumber == taskCancel.TaskNumber);
-
-                if (taskToCancell != null)
-                {
-                    db.RegisteredTo.Remove(taskToCancell);
-                    db.SaveChanges();
-                    return Ok("OK");
-                }
-
-                return Ok("NO");
-            }
-            catch (Exception e)
-            {
-                return Content(HttpStatusCode.BadRequest, e.GetType());
-            }
-        }
     }
 }
