@@ -1,15 +1,14 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 
-const CubeType = ({ type, typeChose}) => {
+const CubeType = ({ type, typeChose }) => {
 
   const [isPress, setIsPress] = useState(false);
-
 
   return (
     <TouchableOpacity onPress={() => {
       isPress ? setIsPress(false) : setIsPress(true)
-        typeChose(type)
+      typeChose(type)
     }}
       style={isPress ? styles.cubePressed : styles.cube}
     >

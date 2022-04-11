@@ -1,16 +1,16 @@
-import { ScrollView, Image, StyleSheet, Text, View, TouchableOpacity, Modal, SafeAreaView } from 'react-native';
+import { Image, StyleSheet, Text, View, TouchableOpacity, Modal, SafeAreaView,Platform } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Entypo } from '@expo/vector-icons';
-import { Checkbox } from 'react-native-paper';
+import { Checkbox,IconButton } from 'react-native-paper';
 import ButtonCustom from '../ComponentStyle/ButtonCustom'
 import InputStyle from '../ComponentStyle/InputStyle'
 import { DatePicker } from "react-native-common-date-picker";
 import ErrorText from "../ComponentStyle/ErrorText";
 import moment from 'moment';
 import { validateEmail } from '../General/utils';
-import { checkIfEmailUsed, checkIfIDValidOrUsed } from '../FetchCalls/signUpAPi';
+import { checkIfEmailUsed, checkIfIDValidOrUsed } from '../FetchCalls/signUpAPI';
 
-const StageTwoRegi = ({ checkAndMove, setOpenCamera, photoUploaded }) => {
+const StageTwoRegi = ({ checkAndMove, setOpenCamera, photoUploaded, setGalleryOpen }) => {
 
   const [date, setDate] = useState({
     dateChose: null,
@@ -28,27 +28,29 @@ const StageTwoRegi = ({ checkAndMove, setOpenCamera, photoUploaded }) => {
     dateError: false,
   });
 
+  const [openFabGroup, setOpenFabGroup] = useState(false);
+
   var maxDate = new Date();
   maxDate.setFullYear((new Date().getFullYear() - 18))
-
+  
   const movieToStageThree = () => {
-    ///פונקציה לבדוק תקינות ואז להעביר לעמוד הבא
-    console.log(checkedM, email, adress, iD, date.dateChose)
     if (!errorsList.emailError && !errorsList.idError && !errorsList.adressError && !errorsList.dateError) {
       if (email != null && adress != null && date != null && iD != null) {
-
         checkAndMove('2', {
           Email: email,
           CityName: adress,
           DateOfBirth: date.dateChose,
           ID: iD,
-          Gender: checkedM ? 'M' : 'F',
-          Photo: photoUploaded
+          Gender: checkedM ? 'M' : 'F',          
         });
       }
     }
   }
 
+  useEffect(() => {
+    setOpenFabGroup(false)
+  }, [photoUploaded])
+ 
   const checkEmails = () => {
     if (!validateEmail(email)) {
       setErrors({ ...errorsList, emailError: "מייל לא תקין " });
@@ -108,7 +110,7 @@ const StageTwoRegi = ({ checkAndMove, setOpenCamera, photoUploaded }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.checkBoxBox}>
         <Text> גבר </Text>
-        <Checkbox
+        <Checkbox   
           status={checkedM ? 'checked' : 'unchecked'}
           color='#52B69A'
           onPress={() => {
@@ -163,13 +165,33 @@ const StageTwoRegi = ({ checkAndMove, setOpenCamera, photoUploaded }) => {
       </Modal>
 
       <View style={styles.btnBox}>
-        <TouchableOpacity style={styles.btnStyle} onPress={() => setOpenCamera(true)}>
+        <TouchableOpacity style={styles.btnStyle} onPress={() => {
+          openFabGroup ? setOpenFabGroup(false) : setOpenFabGroup(true)
+        }}>
           <Text> העלאת תמונה </Text>
           <Entypo name="upload" size={18} color="#F8B11C" />
         </TouchableOpacity>
-        {photoUploaded == null ? null : <View>
+        {photoUploaded == null ? null : <View>     
           <Image style={styles.imageS} source={{ uri: photoUploaded }} />
         </View>
+        }
+        {openFabGroup &&
+          <View style={styles.fabS}>
+            <IconButton
+              style={styles.buttonIcon}
+              size={30}
+              icon="camera"
+              visible={openFabGroup}
+              onPress={() => setOpenCamera(true)}
+            />
+            <IconButton
+              style={styles.buttonIcon}
+              size={30}
+              icon='image-album'
+              visible={openFabGroup}
+              onPress={() => setGalleryOpen(true)}
+            />
+          </View>
         }
       </View>
       <ButtonCustom textInBtn="המשך" func={movieToStageThree} />
@@ -183,6 +205,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     marginTop: 20
+  },
+  labelStyle: {
+    width: 100,
+  },
+  fabS: {
+    position: 'absolute',
+    bottom: 30,
+    left: 10,
+    flexDirection: 'row',
+  },
+  buttonIcon: {
+    backgroundColor: '#52B69A'
   },
   btnStyle: {
     width: '55%',
@@ -222,8 +256,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   imageS: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     borderRadius: 30,
     alignSelf: 'center',
     marginLeft: 10

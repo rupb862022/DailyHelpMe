@@ -35,7 +35,7 @@ namespace WebApplication.Controllers
                             temp = db.Task.Where(x => x.RequestCode == request.RequestCode).Where(x => x.NumOfVulRequired != x.RegisteredTo.Count).ToList();
                             break;
                         case "sortByType":
-                            temp = db.TaskTypes.Where(x => x.VolunteerCode == sortby.VolunteerCode).Select(x => x.Task).Where(x => x.RequestCode == request.RequestCode)
+                            temp = db.TaskTypes.Where(x => x.VolunteerType.VolunteerName == sortby.VolunteerName).Select(x => x.Task).Where(x => x.RequestCode == request.RequestCode)
                                 .Where(x => x.NumOfVulRequired != x.RegisteredTo.Count).ToList();
                             break;
                         case "sortByCityName":
@@ -98,7 +98,7 @@ namespace WebApplication.Controllers
                 return null;
             }
         }
-        
+
         string StatusSet(int TaskNumber, string VolunteerID)
         {
             DailyHelpMeDbContext db = new DailyHelpMeDbContext();
@@ -124,7 +124,7 @@ namespace WebApplication.Controllers
                 List<Requests> res = GetRequests(id, "none", null);
                 if (res == null)
                 {
-                    return Ok("NO");
+                    return Ok("Empty");
                 }
                 return Ok(res);
             }
@@ -133,7 +133,6 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
         }
-
         [Route("getRequestsSorted")]
         [HttpPost]
         public IHttpActionResult Post([FromBody] SortRequestBy sortBy)
@@ -141,7 +140,7 @@ namespace WebApplication.Controllers
             try
             {
                 string type;
-                if (sortBy.VolunteerCode != 0)
+                if (sortBy.VolunteerName != "none")
                 {
                     type = "sortByType";
                 }
@@ -193,7 +192,7 @@ namespace WebApplication.Controllers
             try
             {
                 DailyHelpMeDbContext db = new DailyHelpMeDbContext();
-
+                regi.RegistereStatus = "טרם בוצע";
                 db.RegisteredTo.Add(regi);
 
                 db.SaveChanges();

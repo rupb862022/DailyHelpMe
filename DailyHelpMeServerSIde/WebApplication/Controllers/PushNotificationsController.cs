@@ -12,13 +12,13 @@ using System.Web.Script.Serialization;
 
 namespace WebApplication.Controllers
 {
-     public class PushNotificationsController : ApiController
+    public class PushNotificationsController : ApiController
     {
-     
+
         [Route("sendpushnotification")]
         [HttpPost]
         public string PushNoti(PushNoteData pnd)
-        {       
+        {
             // Create a request using a URL that can receive a post.   
             WebRequest request = WebRequest.Create("https://exp.host/--/api/v2/push/send");
             // Set the Method property of the request to POST.  
@@ -67,7 +67,20 @@ namespace WebApplication.Controllers
                 Users u = db.Users.FirstOrDefault(x => x.TokenID == token);
                 if (u != null)
                 {
-                    return Ok(u.ID);
+                    return Ok(new 
+                    {
+                        u.ID,
+                        u.FirstName,
+                        u.LastName,
+                        u.MobilePhone,           
+                        u.Email,
+                        u.DateOfBirth,
+                        u.Photo,
+                        u.Gender,
+                        u.City.CityName,
+                        u.TokenID,
+                        u.UserDescription,                    
+                    });
                 }
                 return Ok("NO");
             }

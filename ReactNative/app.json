@@ -1,16 +1,24 @@
 {
   "expo": {
-    "userInterfaceStyle": "automatic",
     "name": "dailyhelpme",
     "slug": "dailyhelpme",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "jsEngine": "hermes",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "plugins": [
+      [
+        "expo-facebook",
+        {
+          "userTrackingPermission": false
+        }
+      ]
+    ],
     "updates": {
       "fallbackToCacheTimeout": 0
     },

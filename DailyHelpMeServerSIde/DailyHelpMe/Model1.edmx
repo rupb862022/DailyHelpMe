@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="bgroup86_prodModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="bgroup86_prodModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="City">
           <Key>
             <PropertyRef Name="CityCode" />
@@ -30,6 +30,7 @@
           <Property Name="TaskNumber" Type="int" Nullable="false" />
           <Property Name="Recommendation" Type="nvarchar" MaxLength="200" />
           <Property Name="Rating" Type="char" MaxLength="1" />
+          <Property Name="RegistereStatus" Type="nvarchar" MaxLength="20" />
         </EntityType>
         <EntityType Name="Report">
           <Key>
@@ -395,8 +396,7 @@
             <End Role="VolTypesPreferences" EntitySet="VolTypesPreferences" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="bgroup86_prodModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -432,6 +432,7 @@
           <Property Name="Rating" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
           <NavigationProperty Name="Task" Relationship="Self.FK__Registere__TaskN__4C8B54C9" FromRole="RegisteredTo" ToRole="Task" />
           <NavigationProperty Name="Users" Relationship="Self.FK__RegisteredTo__ID__4B973090" FromRole="RegisteredTo" ToRole="Users" />
+          <Property Name="RegistereStatus" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Report">
           <Key>
@@ -848,6 +849,7 @@
           <EntitySetMapping Name="RegisteredTo">
             <EntityTypeMapping TypeName="bgroup86_prodModel.RegisteredTo">
               <MappingFragment StoreEntitySet="RegisteredTo">
+                <ScalarProperty Name="RegistereStatus" ColumnName="RegistereStatus" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="TaskNumber" ColumnName="TaskNumber" />
                 <ScalarProperty Name="Recommendation" ColumnName="Recommendation" />

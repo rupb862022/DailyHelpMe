@@ -1,13 +1,13 @@
 
+import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
-import LogIn from '../Screens/LogIn'
-import SignUp from '../Screens/SignUp';
+import { Ionicons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Profile from '../Screens/Profile'
+import Chats from '../Screens/Chats';
 import Calendar from '../Screens/Calendar';
 import HomePage from '../Screens/HomePage';
 import AddRequest from '../Screens/AddRequest';
-import { Ionicons } from '@expo/vector-icons';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import React from 'react';
 
 const Tab = createBottomTabNavigator();
 
@@ -37,10 +37,11 @@ const CostumTabBarButton = ({ children, onPress }) => {
 const TabNav = ({ ID }) => {
 
   return (
-    <Tab.Navigator
+    <Tab.Navigator    
       screenOptions={({ route }) => ({
+        tabBarHideOnKeyboard: true,
         tabBarShowLabel: false,
-        tabBarStyle: {
+        tabBarStyle: {      
           showlable: false,
           backgroundColor: '#52B69A',
           height: 70,
@@ -71,7 +72,7 @@ const TabNav = ({ ID }) => {
             case 'Home':
               size = focused ? 25 : 27
               return <Ionicons name='home-outline' size={size} color="white" />
-            case 'Sign':
+            case 'Chats':
               size = focused ? 25 : 27
               return <Ionicons name='chatbubbles-outline' size={size} color="white" />
             case 'AddRequest':
@@ -80,7 +81,7 @@ const TabNav = ({ ID }) => {
             case 'Calendar':
               size = focused ? 25 : 27
               return <Ionicons name='calendar-outline' size={size} color="white" />
-            case 'LogIn':
+            case 'Profile':
               size = focused ? 25 : 27
               return <Ionicons name='person-outline' size={size} color="white" />
             default:
@@ -91,7 +92,7 @@ const TabNav = ({ ID }) => {
       }
     >
       <Tab.Screen name="Home" component={HomePage} options={{title:'דף הבית'}}/>
-      <Tab.Screen name="Sign" component={SignUp} options={{title:'הרשמה'}} tabBarStyle= {{ display: 'none' }}/>
+      <Tab.Screen name="Chats" component={Chats} options={{title:"צ'אטים"}}/>
       <Tab.Screen name="AddRequest" component={AddRequest}
         options={{
           title:'יצירת בקשה',
@@ -101,8 +102,7 @@ const TabNav = ({ ID }) => {
         }}
       />
       <Tab.Screen name="Calendar" component={Calendar} options={{title:'היומן שלי'}} />
-      <Tab.Screen name="LogIn" component={LogIn} />
-
+      <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator >
   )
 }

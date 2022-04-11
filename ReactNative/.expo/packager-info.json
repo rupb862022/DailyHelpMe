@@ -2,7 +2,8 @@
   "devToolsPort": 19002,
   "expoServerPort": 19000,
   "packagerPort": 19000,
-  "expoServerNgrokUrl": "https://78-yv6.edend.dailyhelpme.exp.direct",
-  "packagerNgrokUrl": "https://78-yv6.edend.dailyhelpme.exp.direct",
-  "ngrokPid": 32584
+  "expoServerNgrokUrl": "https://t3-yva.edend.dailyhelpme.exp.direct",
+  "packagerNgrokUrl": "https://t3-yva.edend.dailyhelpme.exp.direct",
+  "ngrokPid": 4532,
+  "webpackServerPort": 19006
 }

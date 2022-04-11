@@ -173,6 +173,7 @@
     <Compile Include="Controllers\AuthenticationController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\HomePageController.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\PushNotificationsController.cs" />
     <Compile Include="Controllers\AddRequestController.cs" />
     <Compile Include="Controllers\TimerController.cs" />
@@ -181,7 +182,10 @@
     <Compile Include="Dto\CancelTask.cs" />
     <Compile Include="Dto\Location.cs" />
     <Compile Include="Dto\PushNoteData.cs" />
+    <Compile Include="Dto\RegisterProfile.cs" />
+    <Compile Include="Dto\RequestDto.cs" />
     <Compile Include="Dto\SortRequestBy.cs" />
+    <Compile Include="Dto\TaskDto.cs" />
     <Compile Include="Dto\UserDto.cs" />
     <Compile Include="Dto\UserForReg.cs" />
     <Compile Include="Global.asax.cs">
@@ -189,6 +193,7 @@
     </Compile>
     <Compile Include="Models\Tasks.cs" />
     <Compile Include="Models\Requests.cs" />
+    <Compile Include="Models\TypeName.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\TimerServices.cs" />
   </ItemGroup>

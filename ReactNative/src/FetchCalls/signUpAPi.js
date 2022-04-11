@@ -17,7 +17,37 @@ export const getTypes=()=>{
 }
 
 export const addUser=(user)=>{
-  console.log("user after stringify: ",JSON.stringify(user))
   return serverFetchAPI('addUser/','POST',JSON.stringify(user));
+}
+
+
+
+export const uploadPic=(picture,picName)=>{
+  let urlAPI = 'https://proj.ruppin.ac.il/bgroup86/prod/uploadpicture';
+ 
+  console.log("picName: ",picName);
+
+  console.log("picture: ",picture);
+  fetch(urlAPI, {
+    method: 'POST',
+    body: picture,
+  })
+  .then((res) => {
+    if (res.status == 201) { return res.json(); }
+    else { return "errrrrr"; }
+  })
+  .then((responseData) => {
+    if (responseData != "err") {
+      let picNameWOExt = picName.substring(0, picName.indexOf("."));
+      let imageNameWithGUID = responseData.substring(responseData.indexOf(picNameWOExt),
+        responseData.indexOf(".jpg") + 4);
+      console.log(imageNameWithGUID);
+      console.log("img uploaded successfully!");
+     return imageNameWithGUID;
+    }
+    else { return "NO" }
+  })
+  .catch(err => { return "NO"  });
+   
 }
 

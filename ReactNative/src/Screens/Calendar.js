@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import PushPage from '../PushNotificatons/PushPage'
 
 const Calendar = () => {
   return (
-    <></>
-    //<PushPage/>
+    <View>
+      <Text>Calendar</Text>
+    </View>
   )
 }
 

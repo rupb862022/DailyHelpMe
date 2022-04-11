@@ -8,7 +8,7 @@ namespace WebApplication.Dto
     public class SortRequestBy
     {
         public Location CurrentLocation { set; get; }
-        public int VolunteerCode { get; set; }
+        public string VolunteerName { get; set; }
         public string ID { get; set; }
 
     }

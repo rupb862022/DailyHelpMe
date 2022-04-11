@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
-import { Calendar, CalendarProps } from 'react-native-calendars';
-import { LocaleConfig } from 'react-native-calendars';
+import { StyleSheet, View, Text } from 'react-native'
+import React from 'react'
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
+import { DATE_TYPE } from 'react-native-common-date-picker';
+import moment from 'moment';
 
-const CalendarBoard = ({ setDate,setOpen,minDate,maxDate }) => {
+const CalendarBoard = ({ setDate, setOpen, minDate, maxDate, startOrEnd }) => {
 
   LocaleConfig.locales['hb'] = {
     monthNames: [
@@ -29,14 +30,13 @@ const CalendarBoard = ({ setDate,setOpen,minDate,maxDate }) => {
   LocaleConfig.defaultLocale = 'hb';
 
   return (
-    <View style={styles.container}>
+    <View >
+      {startOrEnd == "start" ? <Text style={styles.title}>אנא בחר תאריך התחלה </Text> : <Text style={styles.title}>  אנא בחר תאריך סיום </Text>}
       <Calendar
-
         enableSwipeMonths
         style={{
           borderColor: 'white',
           borderWidth: 10,
-          borderRadius: 20,
           padding: 10,
         }}
         theme={{
@@ -77,16 +77,16 @@ const CalendarBoard = ({ setDate,setOpen,minDate,maxDate }) => {
           },
           'stylesheet.day.basic': {
             base: {
-              height: 26,
+              height: 28,
             },
           }
         }}
         maxDate={maxDate}
-        minDate={minDate}   
+        minDate={minDate}
         hideExtraDays={true}
-        onDayPress={day => {       
+        onDayPress={day => {
           setDate(day.dateString)
-          setOpen(false)
+          setOpen(false)  
         }}
         renderArrow={direction => <Ionicons
           name={direction === 'left'
@@ -103,7 +103,11 @@ const CalendarBoard = ({ setDate,setOpen,minDate,maxDate }) => {
 export default CalendarBoard
 
 const styles = StyleSheet.create({
-  container: {
-    margin: 10
+
+  title: {
+    backgroundColor: 'white',
+    padding: 5,
+    fontWeight: 'bold',
+    paddingTop: 7
   }
 })

@@ -18,6 +18,7 @@ namespace DailyHelpMe
         public int TaskNumber { get; set; }
         public string Recommendation { get; set; }
         public string Rating { get; set; }
+        public string RegistereStatus { get; set; }
     
         public virtual Task Task { get; set; }
         public virtual Users Users { get; set; }

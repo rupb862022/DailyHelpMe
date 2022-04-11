@@ -29,13 +29,25 @@ namespace WebApplication.Controllers
 
                 Users user = db.Users.SingleOrDefault(x => x.Email == CheckUser.Email);
                 if (user == null || user.Passwords != password)
-                {
                     return Ok("user not exists");
-                }
+                else if (user.UStatus == "חסום")
+                    return Ok("user blocked");
                 else
-                {
-                    return Ok(user.ID);
-                }
+                    return Ok(new
+                    {
+                        user.ID,
+                        user.FirstName,
+                        user.LastName,
+                        user.MobilePhone,
+                        user.Email,
+                        user.DateOfBirth,
+                        user.Photo,
+                        user.Gender,
+                        user.City.CityName,
+                        user.TokenID,
+                        user.UserDescription,
+                    });
+                
             }
             catch (Exception ex)
             {

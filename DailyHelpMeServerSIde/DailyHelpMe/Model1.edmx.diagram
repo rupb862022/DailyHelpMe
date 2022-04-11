@@ -11,11 +11,11 @@
         <EntityTypeShape EntityType="bgroup86_prodModel.Report" Width="1.5" PointX="2.875" PointY="11.5" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.ReportType" Width="1.5" PointX="6" PointY="12.75" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.Request" Width="1.5" PointX="5.125" PointY="9.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="bgroup86_prodModel.Task" Width="1.75" PointX="7.5" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.Task" Width="1.75" PointX="7.875" PointY="6" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.TaskTypes" Width="1.5" PointX="10.125" PointY="5.875" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.Users" Width="1.5" PointX="2.75" PointY="5.875" IsExpanded="true" />
         <EntityTypeShape EntityType="bgroup86_prodModel.VolTypesPreferences" Width="2" PointX="8.375" PointY="11.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="bgroup86_prodModel.VolunteerType" Width="1.5" PointX="12.375" PointY="7.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="bgroup86_prodModel.VolunteerType" Width="1.5" PointX="12.875" PointY="7.625" IsExpanded="true" />
         <AssociationConnector Association="bgroup86_prodModel.FK__Request__CityCod__40257DE4" ManuallyRouted="false" />
         <AssociationConnector Association="bgroup86_prodModel.FK__Task__CityCode__5F9E293D" ManuallyRouted="false" />
         <AssociationConnector Association="bgroup86_prodModel.FK__Users__CityCode__2B2A60FE" ManuallyRouted="false" />

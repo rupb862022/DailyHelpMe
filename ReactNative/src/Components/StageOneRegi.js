@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import ButtonCustom from '../ComponentStyle/ButtonCustom'
 import InputStyle from '../ComponentStyle/InputStyle'
 import ErrorText from '../ComponentStyle/ErrorText'
-import {checkIfPhoneUsed} from '../FetchCalls/signUpAPi'
+import {checkIfPhoneUsed} from '../FetchCalls/signUpAPI'
 
 const StageOneRegi = ({ checkAndMove }) => {
 

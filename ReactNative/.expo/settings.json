@@ -1,10 +1,10 @@
 {
-  "hostType": "lan",
+  "hostType": "tunnel",
   "lanType": "ip",
   "dev": true,
   "minify": false,
-  "urlRandomness": "78-yv6",
+  "urlRandomness": "t3-yva",
   "https": false,
-  "scheme": "exp+dailyhelpme",
+  "scheme": null,
   "devClient": false
 }

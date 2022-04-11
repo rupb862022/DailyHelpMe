@@ -1,9 +1,7 @@
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import { StyleSheet, View, TextInput } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { Ionicons, Feather, Entypo, FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, Entypo, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import * as Location from 'expo-location';
-
 
 const GOOGLE_PLACES_API_KEY = 'AIzaSyD_GGypBzDabu8UYars4z1DTFG8PLRsvY4';
 

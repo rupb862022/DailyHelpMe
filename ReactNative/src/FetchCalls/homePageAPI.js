@@ -5,6 +5,7 @@ export const getRequests=(id)=>{
 }
 
 export const getRequestsSorted=(json)=>{
+  console.log(JSON.stringify(json));
   return serverFetchAPI("getRequestsSorted/",'POST',JSON.stringify(json));
 }
 
@@ -17,7 +18,7 @@ export const signToTask=(json)=>{
 }
 
 export const cancelTask=(json)=>{
-  return serverFetchAPI('sendpushnotification/','POST',JSON.stringify(json));
+  return serverFetchAPI('cancelTask/','DELETE',JSON.stringify(json));
 }
 
 export const getTypesName=()=>{

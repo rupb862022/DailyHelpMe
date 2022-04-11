@@ -1,40 +1,35 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ScrollView, VirtualizedList } from 'react-native'
-import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native'
+import React, { useState, useEffect, useContext } from 'react';
 import { List } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import {SafeAreaProvider } from "react-native-safe-area-context";
+//import {SafeAreaProvider } from "react-native-safe-area-context";
 import moment from 'moment';
 import { getRequests, signToTaskConfirm, signToTask, getTypesName, getRequestsSorted, cancelTask } from '../FetchCalls/homePageAPI';
 import SelectDropdown from 'react-native-select-dropdown'
 import * as Location from 'expo-location';
 import { Button, Paragraph, Dialog, Portal, Provider } from 'react-native-paper';
+import { userContext } from '../General/userContext';
 
 
 const HomePage = ({ navigation }) => {
 
-  const ID = "208445452"
+  const { user } = useContext(userContext);
+
   const [request, setRequest] = useState([])
 
   const [typeList, setListOfTypes] = useState([])
-
-  const [locationList, setLocationList] = useState(["בחר", "באיזור שלי", "בעיר שלי"])
+  const [locationList, setLocationList] = useState(["כל הארץ", "באיזור שלי", "בעיר שלי"])
 
   const [sortBy, setSortBy] = useState({
-    sortByType: null,
-    sortByLocation: null
-  })
+    sortByType: "כל התחומים",
+    sortByLocation: "כל הארץ",
+  });
 
-  const [userLocation, setUserLocation] = useState({
-    Lat: null,
-    Lng: null,
-    CityName: null,
-  })
-
+  const screenWidth = Dimensions.get('screen').width;
+  const screenHeigth = Dimensions.get('screen').height;
 
   const [visible, setVisible] = useState(false);
-
   const showDialog = () => setVisible(true);
-
   const hideDialog = () => setVisible(false);
 
   const [textForDialog, setTextForDialog] = useState({
@@ -42,99 +37,164 @@ const HomePage = ({ navigation }) => {
     textTitle: "",
   });
 
-  useEffect(() => {
-    getTypesName().then(
+  const getRequestNoSort = () => {
+    getRequests(user.ID).then(
       (result) => {
-        console.log("get types in Home Page successfully: ", result)
-        setListOfTypes(result)
-      },
-      (error) => {
-        console.log("get types in home page Failed=", error);
-      });
+        if (result != "Empty") {
+          setRequest(result);
 
-    getRequests(ID).then(
-      (result) => {
-        setRequest(result);
+          return;
+        }
       },
       (error) => {
         console.log("get request didnt work = ", error);
       });
+  }
+
+  useEffect(() => {
+
+
+  }, [request])
+
+  useEffect(() => {
+    getTypesName().then(
+      (result) => {
+        setListOfTypes(result);
+        return;
+      },
+      (error) => {
+        console.log("get types in home page Failed=", error);
+      });
   }, [])
 
-  useEffect(async () => {
-    // console.log(location)
-    // let reverseGC = await Location.reverseGeocodeAsync(location.coords);
-    // console.log("yoooo", reverseGC);
+  const [sortedListBy, setSortedListBy] = useState({
+    CurrentLocation: {
+      Lat: null,
+      Lng: null,
+      CityName: null,
+    },
+    VolunteerName: null,
+    ID: user.ID,
+  })
 
-    console.log("hiiiiiiiiiiiiiiiiiiiiiiiiii");
-    var config;
-    if (sortBy.sortByLocation == "בחר" && sortBy.sortByType == "כל התחומים") {
-      getRequests(ID).then(
-        (result) => {
-          setRequest(result);
-        },
-        (error) => {
-          console.log("get request didnt work = ", error);
-        });
-      return;
-    }
-    if (sortBy.sortByLocation == "באיזור שלי") {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Permission to access location was denied');
+  useEffect(async () => {
+    setTimeout(async () => {
+      var config;
+      if (sortBy.sortByLocation === "כל הארץ" && sortBy.sortByType === "כל התחומים") {
+        getRequestNoSort();
         return;
       }
-      let location = await Location.getCurrentPositionAsync({});
-       setUserLocation({
-        CityName: null,
-        Lat: location.coords.latitude,
-        Lng: location.coords.longitude
-      });
 
-      config = {
-        CurrentLocation: {
-          Lat: userLocation.Lat,
-          Lng: userLocation.Lng,
-          CityName: null,
-        },
-        VolunteerCode: 0,
-        ID: ID,
-      }
-    }
-    else if ("בעיר שלי") {
-      config = {
-        CurrentLocation: {
-          Lat: null,
-          Lng: null,
-          CityName: "נתניה",
-        },
-        VolunteerCode: 0,
-        ID: ID,
-      }
-    }
-    else if (sortBy.sortByType != null) {
-      config = {
-        CurrentLocation: {
-          Lat: null,
-          Lng: null,
-          CityName: "נתניה",
-        },
-        VolunteerName: sortBy.sortByType,
-        ID: ID,
-      }
-    }
+      if (sortBy.sortByType === "כל התחומים") {
+        if (sortBy.sortByLocation === "באיזור שלי") {
+          let { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+            return;
+          }
+          let location = await Location.getCurrentPositionAsync({});
 
-    getRequestsSorted(config)
-      .then(
-        (result) => {
-          console.log("get sorted requests in Home Page successfully: ", result)
-          setRequest(request)
-        },
-        (error) => {
-          console.log("get sorted request Failed=", error);
-        });
+          config = {
+            CurrentLocation: {
+              Lat: location.coords.latitude,
+              Lng: location.coords.longitude,
+              CityName: null,
+            },
+            VolunteerName: "none",
+            ID: user.ID,
+          }
+        }
+        else if (sortBy.sortByLocation == "בעיר שלי") {
+          config = {
+            CurrentLocation: {
+              Lat: null,
+              Lng: null,
+              CityName: user.CityName,
+            },
+            VolunteerName: "none",
+            ID: user.ID,
+          }
+        }
+      }
+      else {
+        config = {
+          CurrentLocation: {
+            Lat: null,
+            Lng: null,
+            CityName: null,
+          },
+          VolunteerName: sortBy.sortByType,
+          ID: user.ID,
+        }
+      }
 
-  }, [sortBy]);
+      //   setSortedListBy({
+      //     ...sortedListBy,
+      //     VolunteerName: "none",
+      //   })
+      // }
+
+      // if (sortBy.sortByLocation === "באיזור שלי") {
+      //   let { status } = await Location.requestForegroundPermissionsAsync();
+      //   if (status !== 'granted') {
+      //     return;
+      //   }
+      //   let location = await Location.getCurrentPositionAsync({});
+      //   config = {
+      //     CurrentLocation: {
+      //       Lat: location.coords.latitude,
+      //       Lng: location.coords.longitude,
+      //       CityName: null,
+      //     },
+      //     VolunteerName: sortBy.sortByType !== "כל התחומים" ? sortBy.sortByType : null,
+      //     ID: user.ID,
+      //   }
+      //   // setSortedListBy({
+      //   //   ...sortedListBy,
+      //   //   CurrentLocation: {
+      //   //     Lat: location.coords.latitude,
+      //   //     Lng: location.coords.longitude,
+      //   //     CityName: null,
+      //   //   },
+      //   // })
+      // }
+      // else if (sortBy.sortByLocation == "בעיר שלי") {
+      //   setSortedListBy({
+      //     ...sortedListBy,
+      //     CurrentLocation: {
+      //       Lat: null,
+      //       Lng: null,
+      //       CityName: user.CityName,
+      //     },
+      //   })
+      // }
+
+      //       else if (sortBy.sortByLocation === "כל הארץ") {
+      //   setSortedListBy({
+      //     ...sortedListBy,
+      //     CurrentLocation: {
+      //       Lat: null,
+      //       Lng: null,
+      //       CityName: null,
+      //     },
+      //   })
+      // }
+
+      getRequestsSorted(config)
+        .then(
+          (result) => {
+            if (result == null) {
+              ///להוסיף משהו להציג במידה ולא היו בקשות
+              return;
+            }
+            setRequest(result);
+          },
+          (error) => {
+            console.log("get sorted request Failed=", error);
+          });
+    }, 1000)
+
+  }, [request, sortBy]);
+
 
   const signUserToTask = (Task) => {
     console.log("tried to sign!")
@@ -143,8 +203,9 @@ const HomePage = ({ navigation }) => {
     if (Task.Status == "sign") {
       if (!Task.Confirmation) {
         signToTask({
-          ID: ID,
+          ID: user.ID,
           TaskNumber: Task.TaskNumber,
+          RegistereStatus: "טרם בוצע"
         }).then(
           (result) => {
             console.log("Signed To Task Without confirmation successfully: ", result)
@@ -159,20 +220,16 @@ const HomePage = ({ navigation }) => {
       else {
         console.log(moment())
         signToTaskConfirm({
-          ID: ID,
+          ID: user.ID,
           TaskNumber: Task.TaskNumber,
           SignToTaskTime: moment()
         }).then(
           (result) => {
-
             console.log("Signed To Task With confirmation: ", result)
-
             Task.Status = "wait"
-            console.log("status", Task.Status)
             showDialog()
-            setTextForDialog({ textTitle: "שיבוצך בוצע בהצלחה", textBody: `שיבוצך למשימה ${Task.TaskName} ממתין לאישור` })
+            setTextForDialog({ textTitle: "  בקשת השיבוץ התקבלה ", textBody: `שיבוצך למשימה ${Task.TaskName} ממתין לאישור` })
             return;
-
           },
           (error) => {
             console.log("Signed To Task with confirmation error=", error);
@@ -181,7 +238,7 @@ const HomePage = ({ navigation }) => {
     }
     else {
       cancelTask({
-        ID: ID,
+        ID: user.ID,
         TaskNumber: Task.TaskNumber,
       }).then(
         (result) => {
@@ -190,9 +247,8 @@ const HomePage = ({ navigation }) => {
           if (result == "OK") {
             Task.Status = "sign"
             showDialog()
-            setTextForDialog({textTitle:"שיבוצך בוטל בהצלחה",textBody:`שיבוצך למשימה ${Task.TaskName} בוטל בהצלחה`})
+            setTextForDialog({ textTitle: "שיבוצך בוטל בהצלחה", textBody: `שיבוצך למשימה ${Task.TaskName} בוטל בהצלחה` })
           }
-         
         },
         (error) => {
           console.log("Signed To Task with confirmation error=", error);
@@ -200,40 +256,41 @@ const HomePage = ({ navigation }) => {
     }
   }
 
-
   const renderItem = ({ item }) => (
     <List.Accordion
       title={
-        <View>
+        <View style={{
+          height: screenHeigth * 0.13,
+          width: screenWidth * 0.8,
+        }}>
           <View style={{
             flexDirection: 'row',
-            width: '100%',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
+
           }}>
-            <View>
-              <Text style={styles.title}> {item.RequestName} </Text>
-              <Types types={item.TypesList} />
+            <View style={{ marginRight: 10 }}>
+              <Image style={styles.img} source={{ uri: "https://www.attendit.net/images/easyblog_shared/July_2018/7-4-18/b2ap3_large_totw_network_profile_400.jpg" }} />
             </View>
-            <View>
-              <Image style={styles.img} source={require('../../assets/Facebook.png')} />
+            <View style={{ alignItems: 'flex-start' }}>
+              <Text style={styles.title}> {item.RequestName} </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                {item.TypesList != undefined ? <Types types={item.TypesList} /> : null}
+              </View>
             </View>
           </View>
           <View style={{
             flexDirection: 'row',
+            marginTop: 5,
+            justifyContent: 'flex-start',
             width: '80%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: 15,
           }}>
-            <Text style={{ flex: 5 }}> {moment(item.StartDate).format("DD-MM-YYYY")} - {moment(item.EndDate).format("DD-MM-YYYY")} </Text>
-            <Text style={{ flex: 1 }}>    {item.City} </Text>
-            <Ionicons style={{ flex: 1 }} name="location" size={24} color="#F8B11C" />
+            <Ionicons name="location" size={24} color="#F8B11C" />
+            <Text > {moment(item.StartDate).format("DD-MM-YYYY")} - {moment(item.EndDate).format("DD-MM-YYYY")} </Text>
+            <Text > {item.City} </Text>
           </View>
         </View>
       }
       titleStyle={{
-        alignSelf: 'flex-start'
+        fontSize: 14
       }}
       right={() => { null }} >
       <Tasks tasks={item.Tasks} />
@@ -241,20 +298,14 @@ const HomePage = ({ navigation }) => {
   )
 
   const Types = ({ types }) => (
-    <View >
-      <FlatList
-        style={styles.row}
-        data={types}
-        keyExtractor={(item, index) => (index).toString()}
-        renderItem={({ item }) => {
-          return <Text style={styles.text}> {item} </Text>
-        }}
-      />
-    </View>
+    types.map((item, index) => {
+      return <Text key={index} style={styles.text}> | {item} </Text>
+    })
   )
 
   const Tasks = ({ tasks }) => (
     <FlatList
+      style={{ width: screenWidth }}
       data={tasks}
       listKey={(item, index) => (item.TaskNumber + index).toString()}
       keyExtractor={(item, index) => (index).toString()}
@@ -264,24 +315,23 @@ const HomePage = ({ navigation }) => {
             style={{ backgroundColor: '#dedfe1' }}
             title={item.TaskName}
             description={
-              <View style={{ width: '100%', }}>
+              <View style={{ width: screenWidth * 0.9 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                   <Text> תאריך {moment(item.StartDate).format("DD-MM-YYYY")} </Text>
-                  <Text>  בשעה {item.TaskHour} </Text>
+                  <Text>  שעה {item.TaskHour} </Text>
                 </View>
-                <View >
-                  <Text style={{ alignSelf: 'flex-start', marginTop: 5, }}>  {item.TaskDescription} </Text>
-                </View>
+                <Text>  {item.TaskDescription} </Text>
                 <View style={{ width: '100%', justifyContent: 'center' }}>
-                  <TouchableOpacity style={[styles.btnStyle,
-                  {
-                    backgroundColor: item.Status != "wait" ? "#52B69A" : "#808080",
-                  }]}
-                    onPress={() => signUserToTask(item)}
-                  >
-                    <Text style={{ textAlign: 'center' }}>  {item.Status != "wait" ? "שיבוץ" : "בטל שיבוץ"} </Text>
-                  </TouchableOpacity>
-
+                  {user != 0 ?
+                    <TouchableOpacity style={[styles.btnStyle,
+                    {
+                      backgroundColor: item.Status === "sign" ? "#52B69A" : "#808080",
+                    }]}
+                      onPress={() => signUserToTask(item)}
+                    >
+                      <Text style={{ textAlign: 'center' }}>  {item.Status === "sign" ? "שיבוץ" : "בטל שיבוץ"} </Text>
+                    </TouchableOpacity>
+                    : null}
                   {item.Status != "wait" ? null : <View style={{ flexDirection: 'row', marginTop: 3, alignSelf: 'center' }}>
                     <Ionicons name="timer-outline" size={24} color="#F8B11C" />
                     <Text> ממתין לאישור שיבוץ </Text>
@@ -290,15 +340,13 @@ const HomePage = ({ navigation }) => {
               </View>
             }
             descriptionStyle={{
-              width: '100%',
-              textAlign: 'right',
-
+              alignSelf: 'flex-start',
             }}
             titleStyle={{
               fontWeight: 'bold',
               fontSize: 16,
-              width: '100%',
-              textAlign: 'right'
+              alignSelf: 'flex-start',
+
             }}
           />)
       }}
@@ -306,16 +354,16 @@ const HomePage = ({ navigation }) => {
   )
 
   return (
-    <SafeAreaProvider style={styles.container}>
-      <View style={styles.selectedListBox}>
+    <View style={{ width: screenWidth, height: screenHeigth * 0.7 }}>
+      <View style={[styles.selectedListBox, { width: screenWidth, height: screenHeigth * 0.05 }]}>
         <SelectDropdown
           data={typeList}
           defaultButtonText="בחירת תחום עניין"
           onSelect={(selectedItem, index) => {
             console.log("selected: ", selectedItem)
             setSortBy({
+              ...sortBy,
               sortByType: selectedItem,
-              sortByLocation: null
             })
           }}
           buttonTextAfterSelection={(selectedItem, index) => {
@@ -330,7 +378,7 @@ const HomePage = ({ navigation }) => {
           defaultButtonText="בחירת מיקום"
           onSelect={(selectedItem, index) => {
             setSortBy({
-              sortByType: null,
+              ...sortBy,
               sortByLocation: selectedItem
             })
           }}
@@ -342,70 +390,59 @@ const HomePage = ({ navigation }) => {
           }}
         />
       </View>
-      <View >
-        <List.Section>
-          <FlatList           
-            initialNumToRender={request.length}
-            scrollEnabled={true}
-            data={request}
-            renderItem={renderItem}
-            keyExtractor={item => item.RequestCode}
-            listKey={"list1s"}
-            ItemSeparatorComponent={() => {
-              return <View style={{ backgroundColor: "#52B69A", height: 5 }} />
-            }}
-          />
-        </List.Section>
-        <Provider>
-        <View>
-          <Portal>
-            <Dialog visible={visible} onDismiss={hideDialog}>
-              <Dialog.Title>{textForDialog.textTitle}</Dialog.Title>
-              <Dialog.Content>
-                <Paragraph>{textForDialog.textBody}</Paragraph>
-              </Dialog.Content>
-              <Dialog.Actions>
-                <Button onPress={hideDialog}>סגור</Button>
-              </Dialog.Actions>
-            </Dialog>
-          </Portal>
-        </View>
-      </Provider>
-      </View>
-    </SafeAreaProvider >
-  )
+      <List.Section>
 
+        <FlatList
+          render
+          style={{ width: screenWidth, height: screenHeigth * 0.62 }}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+          contentInsetAdjustmentBehavior="always"
+          initialNumToRender={request.length}
+          scrollEnabled={true}
+          data={request}
+          renderItem={renderItem}
+          keyExtractor={item => item.RequestCode}
+          listKey={"list1s"}
+          ItemSeparatorComponent={() => {
+            return <View style={{ backgroundColor: "#52B69A", height: 4 }} />
+          }}
+        />
+      </List.Section>
+      <Provider>
+        <Portal>
+          <Dialog visible={visible} onDismiss={hideDialog}>
+            <Dialog.Title>{textForDialog.textTitle}</Dialog.Title>
+            <Dialog.Content>
+              <Paragraph>{textForDialog.textBody}</Paragraph>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={hideDialog}>סגור</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      </Provider>
+    </View>
+  )
 }
 
-export default HomePage
-
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    height: '85%',
-    alignSelf: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-  },
   img: {
     borderRadius: 40,
     height: 50,
     width: 50,
-    alignSelf: 'flex-start',
     marginLeft: 20
   },
   title: {
     fontSize: 22,
-    textAlign: 'right'
+
   },
   text: {
     fontSize: 14,
     color: 'grey',
-    textAlign: 'right'
+
   },
   btnStyle: {
-
     marginTop: 20,
     textAlign: 'center',
     width: "50%",
@@ -424,10 +461,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 1.8,
     elevation: 4,
-    alignSelf: 'center',
   },
   selectedListBox: {
     flexDirection: 'row',
     marginTop: 10,
   }
 })
+
+export default HomePage;

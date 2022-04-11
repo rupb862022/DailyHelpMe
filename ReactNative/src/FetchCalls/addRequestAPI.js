@@ -1,6 +1,7 @@
 import {serverFetchAPI} from './apiUtils';
 
 export const addRequest=(json)=>{
+  console.log("request after stringify: ",JSON.stringify(json))
   return serverFetchAPI('addRequest','POST',JSON.stringify(json));
 }
 
