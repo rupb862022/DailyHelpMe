@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View, TouchableOpacity, Modal, SafeAreaView,Platform } from 'react-native';
+import { Image, StyleSheet, Text, View, TouchableOpacity, Modal, SafeAreaView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Entypo } from '@expo/vector-icons';
 import { Checkbox,IconButton } from 'react-native-paper';

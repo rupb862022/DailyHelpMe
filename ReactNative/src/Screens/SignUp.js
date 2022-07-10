@@ -1,22 +1,20 @@
 import { StyleSheet, Modal, Text, View, TouchableOpacity, SafeAreaView } from 'react-native'
-import React, { useEffect, useState, useLayoutEffect, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import StageOneRegi from '../Components/StageOneRegi';
 import StageTwoRegi from '../Components/StageTwoRegi';
 import StageThreeRegi from '../Components/StageThreeRegi';
-import { useFocusEffect } from '@react-navigation/native';
 import CameraUpload from '../Components/CameraUpload';
 import { addUser } from '../FetchCalls/signUpAPI'
 import registerForPushNotificationsAsync from '../General/registerForPushNotificationsAsync'
 import * as ImagePicker from 'expo-image-picker';
-import { Paragraph, Dialog, Portal, Provider } from 'react-native-paper';
-import { userContext } from '../General/userContext';
+import CustomPopUp from '../ComponentStyle/CustomPopUp';
 
 const SignUp = ({ navigation }) => {
 
-  const { setUser } = useContext(userContext);
-
   const [formNum, setformNum] = useState(1);
-  const [stage, setStage] = useState(<StageOneRegi />);
+
+ const [stage, setStage] = useState(<StageOneRegi />);
+
 
   const [userToAdd, setUserToAdd] = useState({
     VolunteerTypes: "empty",
@@ -24,7 +22,19 @@ const SignUp = ({ navigation }) => {
 
   const [photo, setPhoto] = useState("none")
   const [modalVisible, setModalVisible] = useState(false);
-  const [dailogVisiable, setDailogVisiable] = useState(false);
+  
+  const [dialog, setDialog] = useState({
+    visible: false,
+    textBody: "",
+    textTitle: "",
+  });
+
+  const finishh =()=>{
+    const timer = setTimeout(() => {
+      navigation.navigate('LogIn');
+      }, 2000)
+      return () => clearTimeout(timer);
+  }
 
   btnOpenGalery = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -43,18 +53,16 @@ const SignUp = ({ navigation }) => {
       addUser(userToAdd).then(
         (result) => {
           if (result == "OK") {
-            setUser(userToAdd);
-            setDailogVisiable(true)
-            setStage(null)
-            setTimeout(() => {
-              setDailogVisiable(false)
-              navigation.navigate('TabNav');
-            }, 10000)
-            console.log("add user successfully");
+            setDialog({
+              visible:true,
+              textBody: `ברוכ/ה הבא/ה לקהילה שלנו :) ${'\n'}מיד נעביר אותך לעמוד הכניסה`,
+              textTitle: "הרשמה בוצעה בהצלחה",
+            })
+            finishh();
+            setStage(null)              
           }
           else {
-            console.log("add user not successfully", result)
-            setformNum(1)
+            navigation.navigate('LogIn');
           }
         },
         (error) => {
@@ -76,6 +84,7 @@ const SignUp = ({ navigation }) => {
           LastName: json.LastName,
           MobilePhone: json.MobilePhone,
           Passwords: json.Passwords,
+          HowSigned:'Signed'
         })
         setformNum(2);
         return;
@@ -115,11 +124,11 @@ const SignUp = ({ navigation }) => {
     if (photo != "none") {
       let urlAPI = 'https://proj.ruppin.ac.il/bgroup86/prod/uploadpicture';
       let picture = new FormData();
-      let picName = "user"
+      let picName = userToAdd.FirstName
 
       picture.append('picture', {
         uri: photo,
-        name: "user.jpg",
+        name: `user${userToAdd.MobilePhone}.jpg`,
         type: 'image/jpg'
       });
 
@@ -190,26 +199,7 @@ const SignUp = ({ navigation }) => {
           <CameraUpload setPicture={setPhoto} setOpen={setModalVisible} />
         </View>
       </Modal>
-      <Modal
-        animationType="slide"
-        backgroundColor="black"
-        visible={dailogVisiable}
-        style={{ width: 100, height: '100%', justifyContent: 'center', alignItems: 'center' }}
-      >
-        <View style={[styles.ModalBox, styles.absolute]}>
-          <Provider>
-            <Portal>
-              <Dialog visible={true}>
-                <Dialog.Title> הרשמה בוצעה בהצלחה </Dialog.Title>
-                <Dialog.Content>
-                  <Paragraph> ברוכ/ה הבא/ה לקהילה שלנו :)  </Paragraph>
-                  <Paragraph> מיד נעביר אותך לעמוד הבית </Paragraph>
-                </Dialog.Content>
-              </Dialog>
-            </Portal>
-          </Provider>
-        </View>
-      </Modal>
+      <CustomPopUp dialog={dialog} setDialog={setDialog} />
 
       <View style={styles.btnBox}>
         <TouchableOpacity
@@ -254,7 +244,7 @@ const styles = StyleSheet.create({
   },
   btnBox: {
     flexDirection: 'row',
-    marginTop: '15%',
+    marginTop: '10%',
     justifyContent: 'space-around',
     alignSelf: 'center',
     alignItems: 'center',

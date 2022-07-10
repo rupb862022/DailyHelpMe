@@ -21,20 +21,20 @@ const styles = StyleSheet.create({
     padding: 7,
     borderRadius: 20,
     fontSize: 18,
-    borderColor:'black',
+    borderColor:"#52B69A",
     borderWidth:1,
     shadowColor: 'black',
     shadowOffset: {
       width: 0,
-      height: 10,
+      height: 5,
     },
     shadowOpacity: 0.5,
     shadowRadius: 1.8,
-    elevation: 4
+    elevation: 5
   },
   text:{
     textAlign: 'center',
     fontSize:14,
-
+    color: 'white',
   }
 })

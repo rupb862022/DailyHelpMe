@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, SafeAreaView } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, Modal, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useState, useEffect } from 'react';
 import CubeType from '../ComponentStyle/CubeType';
 import ToggleStyle from '../ComponentStyle/ToggleStyle';
@@ -6,6 +6,7 @@ import ButtonCustom from '../ComponentStyle/ButtonCustom';
 import { getTypes } from '../FetchCalls/signUpAPI'
 import { Checkbox } from 'react-native-paper';
 import ErrorText from '../ComponentStyle/ErrorText';
+import Policy from './Policy';
 
 const StageThreeRegi = ({ checkAndMove }) => {
 
@@ -23,14 +24,14 @@ const StageThreeRegi = ({ checkAndMove }) => {
       setAgreedToTerms({ ...agreedToTerms, error: true })
     }
     else {
-      if(listOfTypesChose.length == 0){
-        checkAndMove('3',"none");
+      if (listOfTypesChose.length == 0) {
+        checkAndMove('3', "none");
       }
-      else{ 
+      else {
         checkAndMove('3', {
           VolunteerTypes: listOfTypesChose.some(x => x == 'כל התחומים') ? listOfTypes : listOfTypesChose
         })
-      }  
+      }
     }
   }
 
@@ -55,44 +56,55 @@ const StageThreeRegi = ({ checkAndMove }) => {
       });
   }, [])
 
+  const [policyShow, setShowPolicy] = useState(false);
+
   return (
     <SafeAreaView style={styles.container}>
+      <Modal
+        transparent
+        visible={policyShow}
+        onRequestClose={() => { setShowPolicy(false) }}
+      >
+        <View style={styles.modal}>
+          <Policy />
+          <TouchableOpacity onPress={() => setShowPolicy(false)}>
+            <Text style={{fontWeight: 'bold',marginTop:5}}>סגור</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
       <ToggleStyle state={wantToVul} text=" מעוניינים להתנדב" func={setwantToVul} />
       {!wantToVul
         ? null
         : <View>
           <Text style={styles.title}> תחומים שאשמח להתנדב בהם </Text>
-          <View>
-            <FlatList
-              columnWrapperStyle={true}
-              contentContainerStyle={{
-                margin: 5,
-                alignItems: 'flex-end',
 
-              }}
-              numColumns={3}
-              data={listOfTypes}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => {
+          <View style={styles.list}>
+            {
+              listOfTypes.map((type, index) => {
                 return (
-                  <CubeType type={item} typeChose={addTypeToList} />)
-              }}
-            />
+                  <CubeType key={index} type={type} typeChose={addTypeToList} />)
+              })
+            }
           </View>
         </View>
       }
-       <View style={styles.checkBoxBox}>     
+      <View style={styles.checkBoxBox}>
         <Checkbox
           status={agreedToTerms.value ? 'checked' : 'unchecked'}
           color='#52B69A'
           onPress={() => {
-            agreedToTerms.value ? setAgreedToTerms({...agreedToTerms,value:false}):setAgreedToTerms({...agreedToTerms,value:true})
+            agreedToTerms.value ? setAgreedToTerms({ ...agreedToTerms, value: false }) : setAgreedToTerms({ ...agreedToTerms, value: true })
           }}
         />
-         <Text> אני מסכימ/ה לתקנון </Text>     
+        <View style={{ flexDirection: 'row' }}>
+          <Text> אני מסכימ/ה </Text>
+          <TouchableOpacity onPress={() => setShowPolicy(true)}>
+            <Text style={{ textDecorationLine: 'underline' }}>לתקנון</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-     <View style={styles.center}> 
-      {agreedToTerms.error && <ErrorText text="כדי להרשם עלייך לאשר את הסכמתך לתקנון" />}
+      <View style={styles.center}>
+        {agreedToTerms.error && <ErrorText text="כדי להרשם עלייך לאשר את הסכמתך לתקנון" />}
       </View>
       <ButtonCustom textInBtn="לסיום" func={checkThenMove} />
     </SafeAreaView>
@@ -103,7 +115,7 @@ export default StageThreeRegi
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: '10%',
+    marginTop: '5%',
     justifyContent: 'center',
   },
   title: {
@@ -116,12 +128,46 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     marginRight: '9%',
   },
-  checkBoxBox:{
+  checkBoxBox: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center'
   },
-  center:{
-    alignSelf:'center',
-  }
+  center: {
+    alignSelf: 'center',
+  },
+  list: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginTop: 5
+  },
+  ModalBackGround: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    activeOpacity: 1
+  },
+  modal: {
+    backgroundColor: 'white',
+    position: 'absolute',
+    top: "10%",
+    width: "95%",
+    height: "80%",
+    alignSelf: 'center',
+    padding: 5,
+    borderRadius: 10,
+    alignItems: 'center',
+    borderColor: 'black',
+    borderWidth: 1,
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 1.8,
+    elevation: 4,
+  },
 })

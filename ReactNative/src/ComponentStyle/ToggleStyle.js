@@ -11,7 +11,7 @@ const ToggleStyle = ({func,state,text}) => {
       onColor="#52B69A"
       offColor="black"
       label={text}
-      labelStyle={{ color: "black", fontWeight: "900" }}
+      labelStyle={{ color: "black", fontWeight: "400" }}
       size="medium"
       onToggle={() => {
         state ? func(false) : func(true)

@@ -1,11 +1,38 @@
-import { StyleSheet, View, Text } from 'react-native'
-import React from 'react'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import React, { useState, useEffect } from 'react'
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
-import { DATE_TYPE } from 'react-native-common-date-picker';
 import moment from 'moment';
 
-const CalendarBoard = ({ setDate, setOpen, minDate, maxDate, startOrEnd }) => {
+const CalendarBoard = ({ setDate, setOpen, dates, cantCancelDates }) => {
+  
+  const [dateList, setDateList] = useState([]);
+
+  const [cantCancel, setCantCancel] = useState([]);
+
+
+  useEffect(() =>{
+
+    if(dates != null){
+    let temp = [];
+    dates.forEach(x => temp.push(moment(x).format("YYYY-MM-DD")))
+  
+    setDateList(temp);
+
+    let tempy = [];
+    cantCancelDates.forEach(x => {
+      if (x.Status == "signed") {
+        tempy.push(moment(x.TaskDate).format("YYYY-MM-DD"))
+      }
+    })
+    setCantCancel(tempy);
+
+    console.log("cantCancelDates",tempy)
+  }
+
+  },[])
+
+
 
   LocaleConfig.locales['hb'] = {
     monthNames: [
@@ -29,64 +56,64 @@ const CalendarBoard = ({ setDate, setOpen, minDate, maxDate, startOrEnd }) => {
   };
   LocaleConfig.defaultLocale = 'hb';
 
+  const addDateToList = (date) => {
+    if(cantCancel.some(x=> x==date)){
+      return;
+    }
+    if (dateList != []) {
+      let temp = dateList.filter(t => t != date)
+      temp.length == dateList.length ? setDateList([...dateList, date])
+        : setDateList(temp)
+    }
+    else {
+      setDateList([date])
+    }
+  }
+
+  let mark = {}
+  dateList.forEach((date) => {
+    if(cantCancel.some(x=> x==date)){
+      mark[date] = { selected: true, selectedColor: 'grey' };
+
+    }
+    else if(moment(date).isBefore(moment())){
+      mark[date] = { selected: true, selectedColor: 'grey' };
+
+    }
+    else{
+      mark[date] = { selected: true, };
+
+    }
+  });
+
   return (
     <View >
-      {startOrEnd == "start" ? <Text style={styles.title}>אנא בחר תאריך התחלה </Text> : <Text style={styles.title}>  אנא בחר תאריך סיום </Text>}
+      <Text style={styles.title}> אנא בחרו תאריכים למשימה </Text>
       <Calendar
         enableSwipeMonths
         style={{
           borderColor: 'white',
-          borderWidth: 10,
-          padding: 10,
+          borderWidth: 5,  
+          width: "100%"
         }}
         theme={{
           textDayHeaderFontSize: 16,
           calendarBackground: '#EFEFEF',
-          zIndex: 1,
           textSectionTitleColor: '#52B69A',
           textSectionTitleDisabledColor: 'red',
           dayTextColor: 'black',
           todayTextColor: '#52B69A',
-          selectedDayTextColor: '#F8B11C',
+          selectedDayTextColor: 'white',
           monthTextColor: '#52B69A',
           indicatorColor: '#434343',
           selectedDayBackgroundColor: '#52B69A',
-          arrowColor: '#52B69A',
-          'stylesheet.calendar.main': {
-            week: {
-              marginTop: 1,
-              marginBottom: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-around'
-            }
-          },
-          'stylesheet.calendar.header': {
-            header: {
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              paddingLeft: 10,
-              paddingRight: 10,
-              alignItems: 'center',
-              height: 40
-            },
-            week: {
-              marginTop: 6,
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-            }
-          },
-          'stylesheet.day.basic': {
-            base: {
-              height: 28,
-            },
-          }
+          arrowColor: '#52B69A',        
         }}
-        maxDate={maxDate}
-        minDate={minDate}
+        minDate={new Date().toLocaleString()}
+        maxDate={(new Date().getFullYear() + 1).toString()}
         hideExtraDays={true}
         onDayPress={day => {
-          setDate(day.dateString)
-          setOpen(false)  
+          addDateToList(day.dateString)
         }}
         renderArrow={direction => <Ionicons
           name={direction === 'left'
@@ -94,8 +121,20 @@ const CalendarBoard = ({ setDate, setOpen, minDate, maxDate, startOrEnd }) => {
             : 'arrow-back'
           }
         />}
-
+        markedDates={mark}
       />
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around',marginBottom: 10}}>
+        <TouchableOpacity  onPress={() => setOpen(false)}>
+          <Text style={{ color: '#52B69A',fontWeight:'bold' }}>  חזור  </Text>
+        </TouchableOpacity>
+        <TouchableOpacity  onPress={() => {
+          setOpen(false)
+          setDate(dateList)
+        }}
+        >
+          <Text style={{ color: '#52B69A',fontWeight:'bold' }} >  בחר  </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }

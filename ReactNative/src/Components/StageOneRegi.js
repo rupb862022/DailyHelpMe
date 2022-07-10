@@ -1,4 +1,4 @@
-import { StyleSheet, Text, SafeAreaView } from 'react-native';
+import { StyleSheet,ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import ButtonCustom from '../ComponentStyle/ButtonCustom'
 import InputStyle from '../ComponentStyle/InputStyle'
@@ -20,9 +20,6 @@ const StageOneRegi = ({ checkAndMove }) => {
   })
 
   const MoveToPageTwo = () => {
-    ///פונקציה לבדוק תקינות ואז להעביר לעמוד הבא
-    console.log(phone, password, firstName, lastName)
-    console.log(errorsList.firstNameError, errorsList.lastNameError, errorsList.passwordError, errorsList.phoneError)
     if (!errorsList.firstNameError && !errorsList.lastNameError && !errorsList.passwordError && !errorsList.phoneError) {
       if (phone != null && password != null && firstName != null && lastName != null) {
       
@@ -88,8 +85,10 @@ const StageOneRegi = ({ checkAndMove }) => {
           console.log("Phone checked successfully: ", result)
           setErrors({...errorsList,phoneError:result})
         }
-        console.log("Phone checked not successfully: ", result)
-        setErrors({...errorsList,phoneError:result})
+        else{
+          console.log("Phone checked not successfully: ", result)
+          setErrors({...errorsList,phoneError:result})
+        }     
     
       },
       (error) => {
@@ -111,7 +110,7 @@ const StageOneRegi = ({ checkAndMove }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <InputStyle placeHolderText="שם פרטי" icon="Ionicons" nameOfIcon="person" func={setFirstName} funcForCheck={checkNames} max={10} />
       {errorsList.firstNameError != false? <ErrorText text={errorsList.firstNameError}/> : null}
       <InputStyle placeHolderText="שם משפחה" icon="Ionicons" nameOfIcon="person" func={setLastName} funcForCheck={checkNames} max={15} />
@@ -121,7 +120,7 @@ const StageOneRegi = ({ checkAndMove }) => {
       <InputStyle placeHolderText="טלפון" icon="Entypo" nameOfIcon="phone" func={setPhone} funcForCheck={checkPhoneNumber} max={10} />
       {errorsList.phoneError != false? <ErrorText text={errorsList.phoneError}/> : null}
       <ButtonCustom textInBtn="המשך" func={MoveToPageTwo} />
-    </SafeAreaView>
+    </ScrollView>
   )
 }
 

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "819174498478",
+    "firebase_url": "https://dailyhelpme-712a7-default-rtdb.firebaseio.com",
+    "project_id": "dailyhelpme-712a7",
+    "storage_bucket": "dailyhelpme-712a7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819174498478:android:dd48c2595e56bb34928d3f",
+        "android_client_info": {
+          "package_name": "example.expo.googlesignin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "819174498478-efsvf4eda1e1bbm7k8afbgsrqruc1v3f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "example.expo.googlesignin",
+            "certificate_hash": "56c040c9789ef4003ee0abf77dac8c102651f71e"
+          }
+        },
+        {
+          "client_id": "819174498478-vj4492tqkemb53t3228ke212ei7ta4v1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXxA9JUsvnPMhUcW6sOnIffxkqAzBpJ48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "819174498478-vj4492tqkemb53t3228ke212ei7ta4v1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "819174498478-7fspnq3qr24f2b05t4rm9c1dab3h3bjh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "example.expo.googlesignin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

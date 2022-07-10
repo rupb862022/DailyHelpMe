@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Ionicons, Entypo, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
-const GOOGLE_PLACES_API_KEY = 'AIzaSyD_GGypBzDabu8UYars4z1DTFG8PLRsvY4';
+const GOOGLE_PLACES_API_KEY = 'AIzaSyDzzNIGn4Vdk_Ui5WWtQWMnP_gvTqPk7K4';
 
 const InputStyle = ({ placeHolderText, icon, nameOfIcon, func, funcForCheck, max, value }) => {
 
@@ -14,7 +14,7 @@ const InputStyle = ({ placeHolderText, icon, nameOfIcon, func, funcForCheck, max
     placeholder: placeHolderText,
     autoCorrect: false,
     secureTextEntry: (placeHolderText == "סיסמא") ? true : false,
-    keyboardType: (placeHolderText == "טלפון" || placeHolderText == "תעודת זהות") ? "numeric" : null,
+    keyboardType: (placeHolderText == "טלפון" || placeHolderText == "תעודת זהות") ? "phone-pad" : null,
     maxLength: (placeHolderText == "כתובת" || placeHolderText == "תאריך לידה") ? null : max,
     editable: (placeHolderText == "תאריך לידה") ? false : true,
     multiline: (placeHolderText == "אישור שיבוץ") ? true : false,
@@ -52,7 +52,7 @@ const InputStyle = ({ placeHolderText, icon, nameOfIcon, func, funcForCheck, max
             listView: { width: '100%', left:-25},
             separator: { height: 1, backgroundColor: '#52B69A', },
             poweredContainer: { backgroundColor: '#52B69A', },
-          }}
+          }}          
           placeholder="עיר מגורים"
           onPress={(data, details = null) => {
             func(data.description)
@@ -93,9 +93,9 @@ const styles = StyleSheet.create({
   inputBox: {
     flexDirection: "row",
     borderWidth: 1,
-    padding: 12,
+    padding: 7,
     borderColor: 'black',
-    borderRadius: 20,
+    borderRadius: 10,
     width: '80%',
     justifyContent: 'flex-start',
     margin: 10,

@@ -1,60 +1,40 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Dimensions, ActivityIndicator, Modal, TextInput } from 'react-native'
 import React, { useState, useEffect, useContext } from 'react';
 import { List } from 'react-native-paper';
-import { Ionicons } from '@expo/vector-icons';
-//import {SafeAreaProvider } from "react-native-safe-area-context";
+import { Ionicons, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import moment from 'moment';
-import { getRequests, signToTaskConfirm, signToTask, getTypesName, getRequestsSorted, cancelTask } from '../FetchCalls/homePageAPI';
+import { getRequests, signToTask, getTypesName, cancelTask } from '../FetchCalls/homePageAPI';
 import SelectDropdown from 'react-native-select-dropdown'
 import * as Location from 'expo-location';
-import { Button, Paragraph, Dialog, Portal, Provider } from 'react-native-paper';
 import { userContext } from '../General/userContext';
-
+import CrownImg from '../Components/CrownImg';
+import ModalCustom from '../ComponentStyle/ModalCustom';
+import CustomPopUp from '../ComponentStyle/CustomPopUp';
 
 const HomePage = ({ navigation }) => {
 
-  const { user } = useContext(userContext);
+  const { user, setUser } = useContext(userContext);
 
   const [request, setRequest] = useState([])
 
   const [typeList, setListOfTypes] = useState([])
-  const [locationList, setLocationList] = useState(["כל הארץ", "באיזור שלי", "בעיר שלי"])
-
-  const [sortBy, setSortBy] = useState({
-    sortByType: "כל התחומים",
-    sortByLocation: "כל הארץ",
-  });
 
   const screenWidth = Dimensions.get('screen').width;
   const screenHeigth = Dimensions.get('screen').height;
 
-  const [visible, setVisible] = useState(false);
-  const showDialog = () => setVisible(true);
-  const hideDialog = () => setVisible(false);
-
-  const [textForDialog, setTextForDialog] = useState({
+  const [dialog, setDialog] = useState({
+    visible: false,
     textBody: "",
     textTitle: "",
+    color: 'green'
   });
 
-  const getRequestNoSort = () => {
-    getRequests(user.ID).then(
-      (result) => {
-        if (result != "Empty") {
-          setRequest(result);
+  const [tasksShow, setTasksShow] = useState(null);
 
-          return;
-        }
-      },
-      (error) => {
-        console.log("get request didnt work = ", error);
-      });
-  }
+  const [modalPriavteReq, setModalPriavteReq] = useState(false);
+  const [priaveReqText, setPriaveReqText] = useState(null);
 
-  useEffect(() => {
-
-
-  }, [request])
+  const [ReqChose, setReqChose] = useState()
 
   useEffect(() => {
     getTypesName().then(
@@ -67,188 +47,176 @@ const HomePage = ({ navigation }) => {
       });
   }, [])
 
-  const [sortedListBy, setSortedListBy] = useState({
-    CurrentLocation: {
-      Lat: null,
-      Lng: null,
-      CityName: null,
-    },
-    VolunteerName: null,
+  const [filterRequest, setFilterRequest] = useState({
     ID: user.ID,
-  })
+    FilterBy: [],
+  });
 
-  useEffect(async () => {
-    setTimeout(async () => {
-      var config;
-      if (sortBy.sortByLocation === "כל הארץ" && sortBy.sortByType === "כל התחומים") {
-        getRequestNoSort();
-        return;
-      }
+  useEffect(() => {
+    const whenFocus= navigation.addListener('focus', () => {
+      getRequestsList()
+      setReqChose(null)
+      setAskedReqList(false)
+      setTaskChosenDatesList([])
+      setModalPriavteReq(false)
+      setTasksShow(null)
+    });
+    return whenFocus;
+  });
 
-      if (sortBy.sortByType === "כל התחומים") {
-        if (sortBy.sortByLocation === "באיזור שלי") {
-          let { status } = await Location.requestForegroundPermissionsAsync();
-          if (status !== 'granted') {
-            return;
+  const [askedReqList, setAskedReqList] = useState(false)
+
+  const getRequestsList = () => {
+    getRequests(filterRequest).
+      then(
+        (result) => {
+          if (result != "empty") {
+            setRequest(result)
           }
-          let location = await Location.getCurrentPositionAsync({});
-
-          config = {
-            CurrentLocation: {
-              Lat: location.coords.latitude,
-              Lng: location.coords.longitude,
-              CityName: null,
-            },
-            VolunteerName: "none",
-            ID: user.ID,
+          else {
+            setRequest([]);
           }
-        }
-        else if (sortBy.sortByLocation == "בעיר שלי") {
-          config = {
-            CurrentLocation: {
-              Lat: null,
-              Lng: null,
-              CityName: user.CityName,
-            },
-            VolunteerName: "none",
-            ID: user.ID,
-          }
-        }
-      }
-      else {
-        config = {
-          CurrentLocation: {
-            Lat: null,
-            Lng: null,
-            CityName: null,
-          },
-          VolunteerName: sortBy.sortByType,
-          ID: user.ID,
-        }
-      }
+          setAskedReqList(false)
+        },
+        (error) => {
+          console.log("Signed To Task with confirmation error=", error);
+        });
+  }
 
-      //   setSortedListBy({
-      //     ...sortedListBy,
-      //     VolunteerName: "none",
-      //   })
-      // }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      getRequestsList()
+    }, 5000)
+    return () => clearTimeout(timer);
+  }, [filterRequest, request])
 
-      // if (sortBy.sortByLocation === "באיזור שלי") {
-      //   let { status } = await Location.requestForegroundPermissionsAsync();
-      //   if (status !== 'granted') {
-      //     return;
-      //   }
-      //   let location = await Location.getCurrentPositionAsync({});
-      //   config = {
-      //     CurrentLocation: {
-      //       Lat: location.coords.latitude,
-      //       Lng: location.coords.longitude,
-      //       CityName: null,
-      //     },
-      //     VolunteerName: sortBy.sortByType !== "כל התחומים" ? sortBy.sortByType : null,
-      //     ID: user.ID,
-      //   }
-      //   // setSortedListBy({
-      //   //   ...sortedListBy,
-      //   //   CurrentLocation: {
-      //   //     Lat: location.coords.latitude,
-      //   //     Lng: location.coords.longitude,
-      //   //     CityName: null,
-      //   //   },
-      //   // })
-      // }
-      // else if (sortBy.sortByLocation == "בעיר שלי") {
-      //   setSortedListBy({
-      //     ...sortedListBy,
-      //     CurrentLocation: {
-      //       Lat: null,
-      //       Lng: null,
-      //       CityName: user.CityName,
-      //     },
-      //   })
-      // }
-
-      //       else if (sortBy.sortByLocation === "כל הארץ") {
-      //   setSortedListBy({
-      //     ...sortedListBy,
-      //     CurrentLocation: {
-      //       Lat: null,
-      //       Lng: null,
-      //       CityName: null,
-      //     },
-      //   })
-      // }
-
-      getRequestsSorted(config)
-        .then(
-          (result) => {
-            if (result == null) {
-              ///להוסיף משהו להציג במידה ולא היו בקשות
-              return;
-            }
-            setRequest(result);
-          },
-          (error) => {
-            console.log("get sorted request Failed=", error);
-          });
-    }, 1000)
-
-  }, [request, sortBy]);
-
-
-  const signUserToTask = (Task) => {
-    console.log("tried to sign!")
-    console.log(Task);
-
-    if (Task.Status == "sign") {
-      if (!Task.Confirmation) {
-        signToTask({
-          ID: user.ID,
-          TaskNumber: Task.TaskNumber,
-          RegistereStatus: "טרם בוצע"
-        }).then(
-          (result) => {
-            console.log("Signed To Task Without confirmation successfully: ", result)
-            Task.Status = "cancel"
-            showDialog()
-            setTextForDialog({ textTitle: "שיבוצך בוצע בהצלחה", textBody: `שיבוצך למשימה ${Task.TaskName} בוצע בהצלחה` })
-          },
-          (error) => {
-            console.log("Signed To Task Without confirmation error=", error);
-          });
-      }
-      else {
-        console.log(moment())
-        signToTaskConfirm({
-          ID: user.ID,
-          TaskNumber: Task.TaskNumber,
-          SignToTaskTime: moment()
-        }).then(
-          (result) => {
-            console.log("Signed To Task With confirmation: ", result)
-            Task.Status = "wait"
-            showDialog()
-            setTextForDialog({ textTitle: "  בקשת השיבוץ התקבלה ", textBody: `שיבוצך למשימה ${Task.TaskName} ממתין לאישור` })
-            return;
-          },
-          (error) => {
-            console.log("Signed To Task with confirmation error=", error);
-          });
+  const typeFilter = (typeFil) => {
+    let temp = []
+    if (filterRequest.FilterBy.length !== 0) {
+      let yo = filterRequest.FilterBy.filter(x => x.Type != "Volunteer")
+      if (yo.length !== 0) {
+        temp.push(yo[0]);
       }
     }
-    else {
+
+    if (typeFil != "כל התחומים") {
+      temp.push({
+        Type: "Volunteer",
+        VolunteerName: typeFil
+      })
+    }
+
+    setFilterRequest({
+      ID: user.ID,
+      FilterBy: temp
+    })
+
+  }
+
+  const linkFilter = (link) => {
+    let temp = [];
+    if (filterRequest.FilterBy.length !== 0) {
+      let yo = filterRequest.FilterBy.filter(type => type.Type != "Link");
+      if (yo.length !== 0) {
+        temp.push(yo[0])
+      }
+    }
+
+    temp.push({
+      Type: "Link",
+      Link: link
+    })
+
+    setFilterRequest({
+      ID: user.ID,
+      FilterBy: temp
+    })
+  }
+
+  const locationFilter = async (filterLocation) => {
+    let temp = [];
+    if (filterRequest.FilterBy.length !== 0) {
+      let yo = filterRequest.FilterBy.filter(x => x.Type != "Coords" && x.Type != "City");
+      if (yo.length !== 0) {
+        temp.push(yo[0])
+      }
+    }
+
+    if (filterLocation === "באיזור שלי") {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      temp.push({
+        Type: "Coords",
+        Coords: {
+          Lat: location.coords.latitude,
+          Lng: location.coords.longitude,
+        }
+      })
+    }
+    else if (filterLocation === "בעיר שלי") {
+      temp.push({
+        Type: "City",
+        CityName: user.CityName
+      })
+    }
+    setFilterRequest({
+      ID: user.ID,
+      FilterBy: temp
+    })
+  }
+
+  const signUserToTask = (Task) => {
+    console.log("task=", Task)
+
+    if (Task.Status == "sign") {
+      signToTask({
+        ID: user.ID,
+        TaskNumber: Task.TaskNumber,
+        TaskDate: Task.TaskDate
+      }).then(
+        (result) => {
+          setTasksShow(false)
+          if (result == "signed") {
+            console.log("Signed To Task Without confirmation successfully: ", result)
+            setDialog({ visible: true, textTitle: "שיבוצך בוצע בהצלחה", textBody: `שיבוצך למשימה בוצע בהצלחה`, color: "green" })
+            setUser({ ...user, RegisteredTasks: user.RegisteredTasks + 1 })
+          }
+          else if (result == "wait") {
+            console.log("Signed To Task Without confirmation successfully: ", result)
+            setDialog({ visible: true, textTitle: "בקשת השיבוץ התקבלה", textBody: `שיבוצך למשימה ממתין לאישור`, color: "green" })
+          }
+          else {
+            console.log("NO")
+            setDialog({ visible: true, textTitle: "לא ניתן להשתבץ", textBody: `אנא נסה שנית מאוחר יותר`, color: "red" })
+          }
+          setAskedReqList(true)
+          getRequestsList();
+        },
+        (error) => {
+          console.log("Signed To Task Without confirmation error=", error);
+          return;
+        });
+    }
+    if (Task.Status == "cancel" || Task.Status == "wait") {
       cancelTask({
         ID: user.ID,
         TaskNumber: Task.TaskNumber,
+        TaskDate: Task.TaskDate
       }).then(
         (result) => {
           console.log("cancel registration: ", result)
-          console.log(result)
+          setTasksShow(false)
           if (result == "OK") {
-            Task.Status = "sign"
-            showDialog()
-            setTextForDialog({ textTitle: "שיבוצך בוטל בהצלחה", textBody: `שיבוצך למשימה ${Task.TaskName} בוטל בהצלחה` })
+            setDialog({ visible: true, textTitle: "שיבוצך בוטל בהצלחה", textBody: `שיבוצך למשימה בוטל בהצלחה`, color: "green" })
           }
+          else {
+            setDialog({ visible: true, textTitle: "לא ניתן לבטל שיבוץ", textBody: `אנא נסה שנית מאוחר יותר`, color: "red" })
+          }
+          setAskedReqList(true)
+          getRequestsList();
         },
         (error) => {
           console.log("Signed To Task with confirmation error=", error);
@@ -256,173 +224,383 @@ const HomePage = ({ navigation }) => {
     }
   }
 
-  const renderItem = ({ item }) => (
-    <List.Accordion
-      title={
-        <View style={{
-          height: screenHeigth * 0.13,
-          width: screenWidth * 0.8,
-        }}>
+  const [taskNumberAndDate, setTaskChosenDatesList] = useState([]);
+
+  const renderItem = ({ item }) => {
+    return (
+      <View>
+        <TouchableOpacity
+          activeOpacity={0.95}
+          onPress={() => {
+            setTasksShow(true)
+            //setDateTaskChose({ dateChosen: null, taskNum: null })
+            setReqChose(item)
+          }}>
           <View style={{
+            height: screenHeigth * 0.13,
+            width: screenWidth * 0.98,
+            alignSelf: 'flex-start',
             flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: "#B6E0D4",
+            elevation: 6,
+            shadowOpacity: 0.2,
+            shadowRadius: 3,
+            borderRadius: 10,
+            paddingVertical: 5,
+            paddingHorizontal: 5,
+            marginVertical: 5,
+            alignSelf: 'center'
 
           }}>
-            <View style={{ marginRight: 10 }}>
-              <Image style={styles.img} source={{ uri: "https://www.attendit.net/images/easyblog_shared/July_2018/7-4-18/b2ap3_large_totw_network_profile_400.jpg" }} />
-            </View>
-            <View style={{ alignItems: 'flex-start' }}>
-              <Text style={styles.title}> {item.RequestName} </Text>
+        
+            <TouchableOpacity style={{ marginRight: 5, width: "25%" }} onPress={()=>{
+                navigation.navigate("ProfileS",{
+                 screen:"ProfileOfUser",
+                 params: {
+                    ID: item.ID,
+                    FirstName: item.UserUpload,
+                    LastName: item.LastName
+                  }})
+             }}>
+              <CrownImg rank={item.Rank} profile={false} />
+              <Image style={styles.img} source={{ uri: item.Image }} />
+              <Text style={{ alignSelf: 'center', marginRight: 5, color: 'black' }}>{item.UserUpload}</Text>
+            </TouchableOpacity>
+            <View style={{ alignSelf: 'center', width: "75%" }}>
+              <Text style={styles.title}>{item.RequestName}</Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                {item.TypesList != undefined ? <Types types={item.TypesList} /> : null}
+                <Types types={item.TypesList} />
               </View>
+              <Text style={{ marginRight: 10, alignSelf: 'flex-start', fontSize: 13, color: 'grey' }}>{moment(item.StartDate).format("DD-MM-YYYY")} - {moment(item.EndDate).format("DD-MM-YYYY")}</Text>
             </View>
           </View>
-          <View style={{
-            flexDirection: 'row',
-            marginTop: 5,
-            justifyContent: 'flex-start',
-            width: '80%',
-          }}>
-            <Ionicons name="location" size={24} color="#F8B11C" />
-            <Text > {moment(item.StartDate).format("DD-MM-YYYY")} - {moment(item.EndDate).format("DD-MM-YYYY")} </Text>
-            <Text > {item.City} </Text>
-          </View>
-        </View>
-      }
-      titleStyle={{
-        fontSize: 14
-      }}
-      right={() => { null }} >
-      <Tasks tasks={item.Tasks} />
-    </List.Accordion>
-  )
+        </TouchableOpacity>
 
-  const Types = ({ types }) => (
-    types.map((item, index) => {
-      return <Text key={index} style={styles.text}> | {item} </Text>
+      </View>
+    )
+  }
+
+
+  const Types = ({ types }) => {
+    return (
+      types.map((item, index) => {
+        return <Text key={index} style={styles.text}>{index == 0 ? null : <Text> | </Text>}{item}</Text>
+      })
+    )
+  }
+
+
+  const ButtonAcceptOrCancel = ({ taskBtn }) => {
+
+    if (user.ID == 0) {
+      return null;
+    }
+
+    let temp = taskNumberAndDate.find(task => task.TaskNumber == taskBtn.TaskNumber);
+    let tasky = taskBtn.TaskDateStatus.filter(task => task.TaskDate == temp.TaskDate);
+
+
+    if (!tasky.length) {
+      return null
+    }
+
+    tasky = tasky[0];
+
+    return (
+      <TouchableOpacity style={[styles.btnStyle,
+      {
+        borderColor: tasky.Status === "sign" ? "#52B69A" : "#ca3146",
+        backgroundColor: tasky.Status === "sign" ? "#52B69A" : "#ca3146",
+      }]}
+        onPress={() => signUserToTask({
+          Status: tasky.Status,
+          TaskNumber: taskBtn.TaskNumber,
+          TaskDate: tasky.TaskDate
+        })}
+      >
+        <Text style={{ textAlign: 'center', color: "white" }}>{tasky.Status === "sign" ? "שיבוץ" : "בטל שיבוץ"}</Text>
+      </TouchableOpacity>
+    )
+  }
+
+  const updateTaskChosenList = (taskNumber, date) => {
+    let tempList;
+
+    console.log("taskNumberAndDate in update=", taskNumberAndDate)
+    if (!taskNumberAndDate.length) {
+      tempList = [];
+    }
+    else if (taskNumberAndDate.some(x => x.TaskNumber == taskNumber)) {
+      tempList = taskNumberAndDate.filter(x => x.TaskNumber != taskNumber)
+    }
+    else {
+      tempList = taskNumberAndDate;
+    }
+
+    tempList.push({
+      TaskNumber: taskNumber,
+      TaskDate: date
     })
-  )
 
-  const Tasks = ({ tasks }) => (
-    <FlatList
-      style={{ width: screenWidth }}
-      data={tasks}
-      listKey={(item, index) => (item.TaskNumber + index).toString()}
-      keyExtractor={(item, index) => (index).toString()}
-      renderItem={({ item }) => {
-        return (
-          <List.Item
-            style={{ backgroundColor: '#dedfe1' }}
-            title={item.TaskName}
-            description={
-              <View style={{ width: screenWidth * 0.9 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
-                  <Text> תאריך {moment(item.StartDate).format("DD-MM-YYYY")} </Text>
-                  <Text>  שעה {item.TaskHour} </Text>
+    setTaskChosenDatesList(tempList)
+  }
+
+  const Tasks = () => (
+    <View>
+      <View style={{
+        height: screenHeigth * 0.13,
+        width: screenWidth * 0.9,
+        alignSelf: 'flex-start',
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: "#B6E0D4"
+      }}>
+        <TouchableOpacity style={{ marginRight: 5, width: "25%" }} onPress={() =>
+         navigation.navigate("ProfileS",
+         {screen:"ProfileOfUser", params:{
+          ID: ReqChose.ID,
+          FirstName: ReqChose.UserUpload,
+          LastName: ReqChose.LastName
+        }})}>
+          <CrownImg rank={ReqChose.Rank} profile={false} />
+          <Image style={styles.img} source={{ uri: ReqChose.Image }} />
+          <Text style={{ alignSelf: 'center', marginRight: 5, color: 'black' }}>{ReqChose.UserUpload}</Text>
+        </TouchableOpacity>
+        <View style={{ alignSelf: 'center', width: "75%" }}>
+          <Text style={[styles.title, { fontSize: 17 }]}>{ReqChose.RequestName}</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+            {ReqChose.TypesList == null ? null : <Types types={ReqChose.TypesList} />}
+          </View>
+          <Text style={{ marginRight: 10, alignSelf: 'flex-start', fontSize: 13, color: 'grey' }}>{moment(ReqChose.StartDate).format("DD/MM/YYYY")} - {moment(ReqChose.EndDate).format("DD/MM/YYYY")}</Text>
+        </View>
+      </View>
+
+      <FlatList
+        scrollEnabled={true}
+        nestedScrollEnabled={true}
+        data={ReqChose.Task}
+        listKey={(item, index) => (item.TaskNumber + index).toString()}
+        keyExtractor={(item, index) => (index).toString()}
+        ItemSeparatorComponent={() => {
+          return <View style={{ backgroundColor: "black", height: 1, width: "90%", alignSelf: 'center' }} />
+        }}
+        renderItem={({ item }) => {
+          return (
+            <View style={{ width: screenWidth * 0.82, alignSelf: 'center', marginBottom: 10, marginTop: 15, }}>
+              <Text style={[styles.textTitle, { alignSelf: 'center', }]}>{item.TaskName}</Text>
+              <Text style={{ fontSize: 14, alignSelf: 'center', color: 'grey' }}>{item.TaskDescription}</Text>
+              <View style={[styles.row, { justifyContent: 'space-between', marginTop: 5 }]}>
+                <View style={styles.row}>
+                  <SelectDropdown
+                    dropdownIconPosition={'left'}
+                    renderDropdownIcon={() => <Ionicons name="calendar" size={20} color="#F8B11C" />}
+
+                    buttonStyle={{
+                      backgroundColor: 'transparent',
+                      width: "70%",
+                      height: "100%",
+                      alignSelf: 'center',
+                    }}
+                    rowStyle={{ width: "100%", }}
+                    buttonTextStyle={{ fontSize: 16, textAlign: 'center', }}
+                    data={item.DatesForTask}
+                    defaultButtonText={taskNumberAndDate.some(x => x.TaskNumber == item.TaskNumber) ?
+                      moment(taskNumberAndDate.find(x => x.TaskNumber == item.TaskNumber).TaskDate).format('DD/MM/YYYY')
+                      : "בחר תאריך"
+                    }
+                    onSelect={selectedItem => {
+                      updateTaskChosenList(item.TaskNumber, selectedItem)
+                    }}
+                    buttonTextAfterSelection={selectedItem => moment(selectedItem).format('DD/MM/YYYY')}
+                    rowTextForSelection={item => moment(item).format('DD/MM/YYYY')}
+
+                  />
                 </View>
-                <Text>  {item.TaskDescription} </Text>
-                <View style={{ width: '100%', justifyContent: 'center' }}>
-                  {user != 0 ?
-                    <TouchableOpacity style={[styles.btnStyle,
-                    {
-                      backgroundColor: item.Status === "sign" ? "#52B69A" : "#808080",
-                    }]}
-                      onPress={() => signUserToTask(item)}
-                    >
-                      <Text style={{ textAlign: 'center' }}>  {item.Status === "sign" ? "שיבוץ" : "בטל שיבוץ"} </Text>
-                    </TouchableOpacity>
-                    : null}
-                  {item.Status != "wait" ? null : <View style={{ flexDirection: 'row', marginTop: 3, alignSelf: 'center' }}>
-                    <Ionicons name="timer-outline" size={24} color="#F8B11C" />
-                    <Text> ממתין לאישור שיבוץ </Text>
-                  </View>}
+
+                <View style={styles.row}>
+                  <AntDesign name="clockcircleo" size={20} color="#F8B11C" />
+                  <Text style={{ marginLeft: 14 }}>{item.TaskHour.substring(0, 5)}</Text>
+
                 </View>
+
               </View>
-            }
-            descriptionStyle={{
-              alignSelf: 'flex-start',
-            }}
-            titleStyle={{
-              fontWeight: 'bold',
-              fontSize: 16,
-              alignSelf: 'flex-start',
-
-            }}
-          />)
-      }}
-    />
+              <View style={[styles.row, { alignSelf: 'center', marginTop: 10 }]}>
+                <Ionicons name="location" size={20} color="#F8B11C" />
+                <Text style={{ marginLeft: 10 }}>{item.CityName}</Text>
+              </View>
+              <View style={{ width: '100%', justifyContent: 'center' }}>
+                {taskNumberAndDate.some(x => x.TaskNumber == item.TaskNumber) ? <ButtonAcceptOrCancel taskBtn={item} /> : null}
+              </View>
+            </View>
+          )
+        }} />
+    </View>
   )
+
 
   return (
-    <View style={{ width: screenWidth, height: screenHeigth * 0.7 }}>
-      <View style={[styles.selectedListBox, { width: screenWidth, height: screenHeigth * 0.05 }]}>
+    <View style={{ width: screenWidth, height: screenHeigth * 0.8 }}>
+      <Modal
+        transparent
+        visible={tasksShow}
+        onRequestClose={() => { setTasksShow(false) }}
+      >
+        <TouchableOpacity style={styles.ModalBackGround}
+          onPress={() => setTasksShow(false)}
+        >
+          <View style={styles.modal}>
+            <Tasks />
+          </View>
+
+        </TouchableOpacity>
+      </Modal>
+
+      <View style={[styles.row, { width: screenWidth, height: screenHeigth * 0.07 }]}>
+        <SelectDropdown
+          data={user.ID == 0 ? ["כל הארץ", "באיזור שלי"] : ["כל הארץ", "באיזור שלי", "בעיר שלי"]}
+          defaultButtonText="מיקום"
+          onSelect={(selectedItem, index) => {
+            setAskedReqList(true)
+            locationFilter(selectedItem)
+          }}
+          rowTextStyle={{ fontSize: 15 }}
+          renderCustomizedButtonChild={selectedItem => {
+            return (
+              <View style={[styles.row, { alignItems: 'center', justifyContent: 'center' }]}>
+                <TouchableOpacity onPress={() => { setAskedReqList(true); locationFilter("כל הארץ") }}>
+                  {filterRequest.FilterBy.some(x => x.Type == "City" || x.Type == "Coords")
+                    ? <MaterialIcons name="cancel" size={17} color="black" />
+                    : <AntDesign name="filter" size={17} color="black" />}
+                </TouchableOpacity>
+                <Text style={styles.btnTextDropDown}>
+                  {
+                    filterRequest.FilterBy.some(x => x.Type == "City") ? "בעיר שלי"
+                      : filterRequest.FilterBy.some(x => x.Type == "Coords") ? "באיזור שלי"
+                        : "כל הארץ"
+                  }
+                </Text>
+              </View>);
+          }}
+          rowTextForSelection={(item, index) => {
+            return item
+          }}
+          buttonStyle={{
+            width: "30%",
+            height: "100%",
+            backgroundColor: '#e7e5e5',
+          }}
+        />
         <SelectDropdown
           data={typeList}
-          defaultButtonText="בחירת תחום עניין"
+          defaultValue="לפי תחום עניין"
+          defaultButtonText="לפי תחום עניין"
           onSelect={(selectedItem, index) => {
-            console.log("selected: ", selectedItem)
-            setSortBy({
-              ...sortBy,
-              sortByType: selectedItem,
-            })
-          }}
-          buttonTextAfterSelection={(selectedItem, index) => {
-            return selectedItem
+            setAskedReqList(true);
+            typeFilter(selectedItem)
           }}
           rowTextForSelection={(item, index) => {
             return item
           }}
+          buttonStyle={{
+            width: "40%",
+            height: "100%",
+            backgroundColor: '#e7e5e5',
+          }}
+          rowTextStyle={{ fontSize: 15 }}
+          renderCustomizedButtonChild={selectedItem => {
+            return (
+              <View style={[styles.row, { alignItems: 'center', justifyContent: 'center' }]}>
+                <TouchableOpacity onPress={() => { setAskedReqList(true); typeFilter("כל התחומים"); }}>
+                  {filterRequest.FilterBy.some(x => x.Type == "Volunteer") ? <MaterialIcons name="cancel" size={17} color="black" />
+                    : <AntDesign name="filter" size={17} color="black" />}
+                </TouchableOpacity>
+                <Text style={styles.btnTextDropDown}>
+                  {
+                    filterRequest.FilterBy.some(x => x.Type == "Volunteer") ? filterRequest.FilterBy.find(x => x.Type == "Volunteer").VolunteerName : "כל התחומים"
+                  }
+                </Text>
+              </View>);
+          }}
         />
-        <SelectDropdown
-          data={locationList}
-          defaultButtonText="בחירת מיקום"
-          onSelect={(selectedItem, index) => {
-            setSortBy({
-              ...sortBy,
-              sortByLocation: selectedItem
-            })
-          }}
-          buttonTextAfterSelection={(selectedItem, index) => {
-            return selectedItem
-          }}
-          rowTextForSelection={(item, index) => {
-            return item
-          }}
-        />
-      </View>
-      <List.Section>
 
-        <FlatList
-          render
-          style={{ width: screenWidth, height: screenHeigth * 0.62 }}
-          keyboardDismissMode="on-drag"
-          keyboardShouldPersistTaps="handled"
-          contentInsetAdjustmentBehavior="always"
-          initialNumToRender={request.length}
-          scrollEnabled={true}
-          data={request}
-          renderItem={renderItem}
-          keyExtractor={item => item.RequestCode}
-          listKey={"list1s"}
-          ItemSeparatorComponent={() => {
-            return <View style={{ backgroundColor: "#52B69A", height: 4 }} />
+        <View style={{ width: "30%", alignItems: 'center', justifyContent: 'center', backgroundColor: '#e7e5e5', height: "100%", flexDirection: 'row', }}>
+
+          <TouchableOpacity onPress={() => {
+            let temp = filterRequest.FilterBy.filter(x => x.Type != "Link");
+            setAskedReqList(true);
+            setFilterRequest({
+              ID: user.ID,
+              FilterBy: temp
+            })
+          }}>
+            {filterRequest.FilterBy.some(x => x.Type == "Link") ? <MaterialIcons name="cancel" size={17} color="black" /> : null}
+
+          </TouchableOpacity>
+          <TouchableOpacity style={{
+            alignItems: 'center', justifyContent: 'center', flexDirection: 'row',
           }}
-        />
-      </List.Section>
-      <Provider>
-        <Portal>
-          <Dialog visible={visible} onDismiss={hideDialog}>
-            <Dialog.Title>{textForDialog.textTitle}</Dialog.Title>
-            <Dialog.Content>
-              <Paragraph>{textForDialog.textBody}</Paragraph>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={hideDialog}>סגור</Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
-      </Provider>
+            onPress={() => {
+              setModalPriavteReq(true);
+              setPriaveReqText("");
+            }}
+          >
+            {filterRequest.FilterBy.some(x => x.Type == "Link") ? null
+              : <AntDesign name="pluscircleo" size={17} color="black" />
+            }
+            <Text style={{ fontSize: 13, marginLeft: 2 }}>בקשה אישית</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <ModalCustom setClose={setModalPriavteReq} visible={modalPriavteReq} content={
+
+        <View>
+          <Text style={styles.textTitle}>הכנס קוד משימה אישית:</Text>
+          <TextInput style={styles.input}
+            onChangeText={(text) => setPriaveReqText(text)}
+            placeholder=" קוד משימה"
+          />
+          <View style={[styles.row, styles.center]}>
+            <TouchableOpacity style={styles.btnModal} onPress={() => setModalPriavteReq(false)}>
+              <Text style={styles.btnModalText}> סגור </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.btnModal}
+              onPress={() => {
+                linkFilter(priaveReqText)
+                setModalPriavteReq(false)
+                setAskedReqList(true)
+              }}>
+              <Text style={styles.btnModalText}> חפש </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      } />
+      {askedReqList ? <ActivityIndicator /> :
+        <List.Section>
+          <FlatList
+            style={{ width: screenWidth, height: screenHeigth * 0.62 }}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            contentInsetAdjustmentBehavior="always"
+            scrollEnabled={true}
+            data={request}
+            renderItem={renderItem}
+            keyExtractor={item => item.RequestCode}
+            listKey={"list1s"}
+            ListEmptyComponent={() => {
+              return (
+                <View>
+                  {!filterRequest.FilterBy.length ? <ActivityIndicator /> : <Text> לא נמצאו תוצאות </Text>}
+                </View>
+              );
+            }}
+          />
+        </List.Section>
+      }
+      <CustomPopUp dialog={dialog} setDialog={setDialog} />
+
     </View>
+
   )
 }
 
@@ -431,27 +609,28 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     height: 50,
     width: 50,
-    marginLeft: 20
+    alignSelf: 'center'
   },
   title: {
-    fontSize: 22,
-
+    fontSize: 17,
+    fontWeight: 'bold',
   },
   text: {
-    fontSize: 14,
+    fontSize: 13,
     color: 'grey',
-
+  },
+  textTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginBottom: 3
   },
   btnStyle: {
-    marginTop: 20,
-    textAlign: 'center',
-    width: "50%",
-    color: "black",
+    marginTop: 12,
+    width: "40%",
     alignSelf: 'center',
-    padding: 7,
+    padding: 5,
     borderRadius: 20,
-    fontSize: 14,
-    borderColor: 'black',
+    borderColor: '#52B69A',
     borderWidth: 1,
     shadowColor: 'black',
     shadowOffset: {
@@ -461,11 +640,78 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 1.8,
     elevation: 4,
+    marginBottom: 5
   },
-  selectedListBox: {
+  row: {
     flexDirection: 'row',
-    marginTop: 10,
+  },
+  center: {
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  modal: {
+    backgroundColor: 'white',
+    position: 'absolute',
+    top: "15%",
+    width: "95%",
+    alignSelf: 'center',
+    padding: 5,
+    borderRadius: 10,
+    alignItems: 'center',
+    borderColor: 'black',
+    borderWidth: 1,
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 1.8,
+    elevation: 4,
+  },
+  input: {
+    color: 'black',
+    marginLeft: 10,
+    flex: 1,
+    textAlign: 'right',
+    borderWidth: 1,
+    padding: 8,
+    borderColor: 'black',
+    borderRadius: 10,
+    width: '100%',
+    margin: 10,
+    marginBottom: 15,
+    alignSelf: 'center'
+  },
+  btnModal: {
+    width: "30%",
+    marginBottom: 5
+  },
+  btnModalText: {
+    color: "#52B69A",
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  btnTextDropDown: {
+    fontSize: 13,
+    padding: 2
+  },
+  ModalBackGround: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    activeOpacity: 1
+  },
+  shadow: {
+    elevation: 10,
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    borderRadius: 10,
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    marginVertical: 5,
   }
+
 })
 
 export default HomePage;

@@ -1,12 +1,7 @@
 import {serverFetchAPI} from './apiUtils';
 
-export const getRequests=(id)=>{
-  return serverFetchAPI('getRequests/','POST',JSON.stringify(id));
-}
-
-export const getRequestsSorted=(json)=>{
-  console.log(JSON.stringify(json));
-  return serverFetchAPI("getRequestsSorted/",'POST',JSON.stringify(json));
+export const getRequests=(json)=>{
+  return serverFetchAPI('getRequests/','POST',JSON.stringify(json));
 }
 
 export const signToTaskConfirm=(json)=>{
@@ -15,6 +10,10 @@ export const signToTaskConfirm=(json)=>{
 
 export const signToTask=(json)=>{
   return serverFetchAPI('signToTask/','POST',JSON.stringify(json));
+}
+
+export const getTasks=(json)=>{
+  return serverFetchAPI('getTasks/','POST',JSON.stringify(json));
 }
 
 export const cancelTask=(json)=>{
